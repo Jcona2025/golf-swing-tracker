@@ -1,0 +1,38 @@
+# Garmin SDK Manager (large, external)
+sdkmanager.AppImage
+connectiq-sdk-manager-linux.zip
+sdk.zip
+
+# SDK Manager extracted files
+bin/
+share/
+
+# Monkey C build artifacts
+gen/
+internal-mir/
+external-mir/
+*.prg
+*.prg.debug.xml
+
+# One-off setup scripts
+dl.sh
+keygen.sh
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp

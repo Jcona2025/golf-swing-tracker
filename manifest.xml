@@ -1,0 +1,15 @@
+<iq:manifest xmlns:iq="http://www.garmin.com/xml/connectiq" version="1">
+    <iq:application entry="SwingLoggerApp" id="A1B2C3D4E5F647A8B9C0D1E2F3A4B5C6" launcherIcon="@Drawables.LauncherIcon" minSdkVersion="3.4.0" name="@Strings.AppName" type="watch-app">
+        <iq:products>
+            <iq:product id="fr255"/>
+        </iq:products>
+        <iq:permissions>
+            <iq:uses-permission id="Sensor"/>
+            <iq:uses-permission id="Fit"/>
+            <iq:uses-permission id="FitContributor"/>
+        </iq:permissions>
+        <iq:languages>
+            <iq:language>eng</iq:language>
+        </iq:languages>
+    </iq:application>
+</iq:manifest>
