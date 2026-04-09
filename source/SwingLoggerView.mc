@@ -48,11 +48,16 @@ class SwingLoggerView extends WatchUi.View {
     }
 
     public function onLayout(dc as Dc) {
-        _dataTimer = new Timer.Timer();
-        _dataTimer.start(method(:timerCallback), 40, true);
     }
 
     public function onShow() as Void {
+        // Start the sensor polling timer when the view becomes visible.
+        // This is also called after onHide() when a notification clears,
+        // so the timer resumes automatically without losing the session.
+        if (_dataTimer == null) {
+            _dataTimer = new Timer.Timer();
+            _dataTimer.start(method(:timerCallback), 40, true);
+        }
     }
 
     public function onUpdate(dc as Dc) as Void {
@@ -246,11 +251,16 @@ class SwingLoggerView extends WatchUi.View {
     }
 
     public function onHide() as Void {
+        // IMPORTANT: do NOT stop the recording session here.
+        // onHide() fires for notifications, screen dim, widget swipes —
+        // none of those mean the user wants to end the round. Killing the
+        // session on hide caused notifications to silently end rounds.
+        // The ActivityRecording.Session is an OS-level resource and survives
+        // view hides on its own. Just pause the polling timer to save battery;
+        // it gets restarted in onShow().
         if (_dataTimer != null) {
             _dataTimer.stop();
-        }
-        if (_recording) {
-            stopRecording();
+            _dataTimer = null;
         }
     }
 }
