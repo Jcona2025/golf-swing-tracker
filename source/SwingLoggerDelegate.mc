@@ -20,6 +20,12 @@ class SwingLoggerDelegate extends WatchUi.BehaviorDelegate {
         return true;
     }
 
+    // DOWN button marks a shot
+    public function onNextPage() as Boolean {
+        _view.markShot();
+        return true;
+    }
+
     // BACK button exits (stop recording first if active)
     public function onBack() as Boolean {
         if (_view.isRecording()) {

@@ -1,5 +1,6 @@
 import Toybox.Activity;
 import Toybox.ActivityRecording;
+import Toybox.Attention;
 import Toybox.FitContributor;
 import Toybox.Graphics;
 import Toybox.Lang;
@@ -25,6 +26,12 @@ class SwingLoggerView extends WatchUi.View {
     private var _fPeakX as FitContributor.Field?;
     private var _fPeakY as FitContributor.Field?;
     private var _fPeakZ as FitContributor.Field?;
+    private var _fShotMarker as FitContributor.Field?;
+
+    // Shot marker state
+    private var _shotCount as Number = 0;
+    private var _shotMarked as Boolean = false;
+    private var _shotFlashTimer as Number = 0;
 
     // Current readings for display
     private var _accelX as Number = 0;
@@ -84,8 +91,17 @@ class SwingLoggerView extends WatchUi.View {
         dc.setColor(Graphics.COLOR_YELLOW, Graphics.COLOR_TRANSPARENT);
         dc.drawText(width / 2, yStart + 70, Graphics.FONT_TINY, "Mag: " + _displayMag.format("%.0f"), Graphics.TEXT_JUSTIFY_CENTER);
 
+        // Shot count + flash feedback
+        if (_shotFlashTimer > 0) {
+            dc.setColor(Graphics.COLOR_GREEN, Graphics.COLOR_TRANSPARENT);
+            dc.drawText(width / 2, yStart + 92, Graphics.FONT_SMALL, "SHOT " + _shotCount, Graphics.TEXT_JUSTIFY_CENTER);
+            _shotFlashTimer--;
+        } else {
+            dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
+            dc.drawText(width / 2, yStart + 92, Graphics.FONT_TINY, "Shots: " + _shotCount, Graphics.TEXT_JUSTIFY_CENTER);
+        }
+
         dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(width / 2, height - 50, Graphics.FONT_TINY, "Jerk: " + _displayJerk.format("%.0f"), Graphics.TEXT_JUSTIFY_CENTER);
         dc.drawText(width / 2, height - 30, Graphics.FONT_TINY, "Time: " + _seconds + "s", Graphics.TEXT_JUSTIFY_CENTER);
     }
 
@@ -176,6 +192,17 @@ class SwingLoggerView extends WatchUi.View {
         if (_fPeakY != null) { _fPeakY.setData(_peakY); }
         if (_fPeakZ != null) { _fPeakZ.setData(_peakZ); }
 
+        // Write shot marker: the running shot count if marked this second, 0 otherwise.
+        // This means in the FIT file, shot_marker > 0 indicates the second a shot was confirmed.
+        if (_fShotMarker != null) {
+            if (_shotMarked) {
+                _fShotMarker.setData(_shotCount);
+                _shotMarked = false;
+            } else {
+                _fShotMarker.setData(0);
+            }
+        }
+
         _displayJerk = _maxJerk;
 
         // Reset for next second
@@ -220,10 +247,15 @@ class SwingLoggerView extends WatchUi.View {
         _fPeakZ = _session.createField("peak_z", 7,
             FitContributor.DATA_TYPE_SINT16,
             {:mesgType => FitContributor.MESG_TYPE_RECORD, :units => "mg"});
+        _fShotMarker = _session.createField("shot_marker", 8,
+            FitContributor.DATA_TYPE_SINT16,
+            {:mesgType => FitContributor.MESG_TYPE_RECORD, :units => ""});
 
         _session.start();
         _recording = true;
         _seconds = 0;
+        _shotCount = 0;
+        _shotMarked = false;
         _magBuffer = [] as Array<Float>;
         _peakX = 0;
         _peakY = 0;
@@ -248,6 +280,28 @@ class SwingLoggerView extends WatchUi.View {
 
     public function isRecording() as Boolean {
         return _recording;
+    }
+
+    public function markShot() as Void {
+        if (!_recording) {
+            return;
+        }
+        _shotCount++;
+        _shotMarked = true;
+        _shotFlashTimer = 3;  // show flash for ~3 screen updates
+
+        // Write marker immediately so the current FIT record gets it
+        if (_fShotMarker != null) {
+            _fShotMarker.setData(_shotCount);
+        }
+
+        // Vibrate to confirm
+        if (Toybox has :Attention) {
+            var vibePattern = [new Attention.VibeProfile(100, 200)] as Array<Attention.VibeProfile>;
+            Attention.vibrate(vibePattern);
+        }
+
+        WatchUi.requestUpdate();
     }
 
     public function onHide() as Void {
