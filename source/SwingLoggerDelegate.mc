@@ -10,10 +10,11 @@ class SwingLoggerDelegate extends WatchUi.BehaviorDelegate {
         _view = view;
     }
 
-    // START button toggles recording
+    // SELECT button: start recording, or confirm before stopping
     public function onSelect() as Boolean {
         if (_view.isRecording()) {
-            _view.stopRecording();
+            var confirm = new WatchUi.Confirmation("Stop recording?");
+            WatchUi.pushView(confirm, new StopConfirmDelegate(_view), WatchUi.SLIDE_UP);
         } else {
             _view.startRecording();
         }
@@ -26,12 +27,50 @@ class SwingLoggerDelegate extends WatchUi.BehaviorDelegate {
         return true;
     }
 
-    // BACK button exits (stop recording first if active)
+    // BACK button: confirm before exiting if recording
     public function onBack() as Boolean {
         if (_view.isRecording()) {
-            _view.stopRecording();
+            var confirm = new WatchUi.Confirmation("Stop and exit?");
+            WatchUi.pushView(confirm, new ExitConfirmDelegate(_view), WatchUi.SLIDE_UP);
             return true;
         }
         return false;
+    }
+}
+
+// Confirmation delegate for stopping recording (SELECT during recording)
+class StopConfirmDelegate extends WatchUi.ConfirmationDelegate {
+
+    private var _view as SwingLoggerView;
+
+    public function initialize(view as SwingLoggerView) {
+        ConfirmationDelegate.initialize();
+        _view = view;
+    }
+
+    public function onResponse(response as WatchUi.Confirm) as Boolean {
+        if (response == WatchUi.CONFIRM_YES) {
+            _view.stopRecording();
+        }
+        return true;
+    }
+}
+
+// Confirmation delegate for exiting the app (BACK during recording)
+class ExitConfirmDelegate extends WatchUi.ConfirmationDelegate {
+
+    private var _view as SwingLoggerView;
+
+    public function initialize(view as SwingLoggerView) {
+        ConfirmationDelegate.initialize();
+        _view = view;
+    }
+
+    public function onResponse(response as WatchUi.Confirm) as Boolean {
+        if (response == WatchUi.CONFIRM_YES) {
+            _view.stopRecording();
+            System.exit();
+        }
+        return true;
     }
 }
