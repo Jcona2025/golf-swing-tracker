@@ -5,6 +5,7 @@ import Toybox.FitContributor;
 import Toybox.Graphics;
 import Toybox.Lang;
 import Toybox.Math;
+import Toybox.Position;
 import Toybox.Sensor;
 import Toybox.System;
 import Toybox.Timer;
@@ -32,6 +33,9 @@ class SwingLoggerView extends WatchUi.View {
     private var _shotCount as Number = 0;
     private var _shotMarked as Boolean = false;
     private var _shotFlashTimer as Number = 0;
+
+    // GPS state
+    private var _gpsQuality as Number = 0;  // Position.QUALITY_* value
 
     // Current readings for display
     private var _accelX as Number = 0;
@@ -77,6 +81,18 @@ class SwingLoggerView extends WatchUi.View {
         if (_recording) {
             dc.setColor(Graphics.COLOR_RED, Graphics.COLOR_TRANSPARENT);
             dc.drawText(width / 2, 5, Graphics.FONT_SMALL, "REC", Graphics.TEXT_JUSTIFY_CENTER);
+
+            // GPS quality dot: red=none, yellow=poor, green=good
+            var gpsColor = Graphics.COLOR_RED;
+            if (_gpsQuality == Position.QUALITY_GOOD) {
+                gpsColor = Graphics.COLOR_GREEN;
+            } else if (_gpsQuality == Position.QUALITY_USABLE) {
+                gpsColor = Graphics.COLOR_YELLOW;
+            } else if (_gpsQuality == Position.QUALITY_POOR) {
+                gpsColor = Graphics.COLOR_ORANGE;
+            }
+            dc.setColor(gpsColor, Graphics.COLOR_TRANSPARENT);
+            dc.drawText(width / 2 + 40, 5, Graphics.FONT_SMALL, "GPS", Graphics.TEXT_JUSTIFY_CENTER);
         } else {
             dc.setColor(Graphics.COLOR_GREEN, Graphics.COLOR_TRANSPARENT);
             dc.drawText(width / 2, 5, Graphics.FONT_SMALL, "READY", Graphics.TEXT_JUSTIFY_CENTER);
@@ -218,9 +234,14 @@ class SwingLoggerView extends WatchUi.View {
             return;
         }
 
+        // Enable GPS. The position callback keeps GPS active and updates
+        // our quality indicator; the FIT activity session automatically
+        // logs the GPS fix into record messages (lat/lon/altitude).
+        Position.enableLocationEvents(Position.LOCATION_CONTINUOUS, method(:onPosition));
+
         _session = ActivityRecording.createSession({
-            :name => "GolfSwing",
-            :sport => Activity.SPORT_GENERIC
+            :name => "PitchPutt",
+            :sport => Activity.SPORT_GOLF
         });
 
         _fPeakMag = _session.createField("peak_mag", 0,
@@ -274,8 +295,14 @@ class SwingLoggerView extends WatchUi.View {
             _session.save();
             _session = null;
         }
+        Position.enableLocationEvents(Position.LOCATION_DISABLE, method(:onPosition));
         _recording = false;
         _seconds = 0;
+        _gpsQuality = 0;
+    }
+
+    public function onPosition(info as Position.Info) as Void {
+        _gpsQuality = info.accuracy;
     }
 
     public function isRecording() as Boolean {
