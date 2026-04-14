@@ -288,14 +288,28 @@ class SwingLoggerView extends WatchUi.View {
 
     public function stopRecording() as Void {
         if (_session != null) {
-            if (_magBuffer.size() > 0) {
-                computeAndWriteFeatures();
+            try {
+                if (_magBuffer.size() > 0 && _seconds > 0) {
+                    computeAndWriteFeatures();
+                }
+                _session.stop();
+                // Discard rather than save if the session is too short to contain
+                // useful data. Saving a near-empty FIT file can trigger IQ! errors.
+                if (_seconds >= 2) {
+                    _session.save();
+                } else {
+                    _session.discard();
+                }
+            } catch (e) {
+                // Any CIQ API failure — make sure the app doesn't die.
             }
-            _session.stop();
-            _session.save();
             _session = null;
         }
-        Position.enableLocationEvents(Position.LOCATION_DISABLE, method(:onPosition));
+        try {
+            Position.enableLocationEvents(Position.LOCATION_DISABLE, method(:onPosition));
+        } catch (e) {
+            // Disabling GPS when it wasn't enabled can throw — safe to ignore.
+        }
         _recording = false;
         _seconds = 0;
         _gpsQuality = 0;
