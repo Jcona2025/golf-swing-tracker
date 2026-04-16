@@ -28,11 +28,19 @@ class SwingLoggerView extends WatchUi.View {
     private var _fPeakY as FitContributor.Field?;
     private var _fPeakZ as FitContributor.Field?;
     private var _fShotMarker as FitContributor.Field?;
+    private var _fPeakDuration as FitContributor.Field?;
+    private var _fRiseRate as FitContributor.Field?;
+    private var _fPeakCount as FitContributor.Field?;
+    private var _fPreStillness as FitContributor.Field?;
 
     // Shot marker state
     private var _shotCount as Number = 0;
     private var _shotMarked as Boolean = false;
     private var _shotFlashTimer as Number = 0;
+
+    // Pre-shot stillness: rolling buffer of per-second mean magnitudes
+    // for the last few seconds. Low values = standing still.
+    private var _recentMeans as Array<Float>;
 
     // GPS state
     private var _gpsQuality as Number = 0;  // Position.QUALITY_* value
@@ -56,6 +64,7 @@ class SwingLoggerView extends WatchUi.View {
     public function initialize() {
         View.initialize();
         _magBuffer = [] as Array<Float>;
+        _recentMeans = [] as Array<Float>;
     }
 
     public function onLayout(dc as Dc) {
@@ -178,19 +187,19 @@ class SwingLoggerView extends WatchUi.View {
             return;
         }
 
-        // Compute mean
+        // --- Existing features ---
         var sum = 0.0 as Float;
         var peakMag = 0.0 as Float;
         var minMag = 99999.0 as Float;
+        var peakIdx = 0;
         for (var i = 0; i < n; i++) {
             var v = _magBuffer[i] as Float;
             sum += v;
-            if (v > peakMag) { peakMag = v; }
+            if (v > peakMag) { peakMag = v; peakIdx = i; }
             if (v < minMag) { minMag = v; }
         }
         var meanMag = sum / n.toFloat();
 
-        // Compute std deviation
         var sumSq = 0.0 as Float;
         for (var i = 0; i < n; i++) {
             var diff = (_magBuffer[i] as Float) - meanMag;
@@ -198,7 +207,66 @@ class SwingLoggerView extends WatchUi.View {
         }
         var stdMag = Math.sqrt(sumSq / n.toFloat()).toFloat();
 
-        // Write to FIT fields
+        // --- NEW FEATURE 1: peak_duration ---
+        // How many consecutive samples are above 80% of peak magnitude?
+        // Short duration = sharp impact (shot), long = sustained motion (walking/bending).
+        // Each sample is ~40ms, so duration in ms = count * 40.
+        var threshold80 = peakMag * 0.8;
+        var peakDuration = 0;
+        // Expand outward from peak index
+        for (var i = peakIdx; i < n; i++) {
+            if ((_magBuffer[i] as Float) >= threshold80) { peakDuration++; } else { break; }
+        }
+        for (var i = peakIdx - 1; i >= 0; i--) {
+            if ((_magBuffer[i] as Float) >= threshold80) { peakDuration++; } else { break; }
+        }
+        var peakDurationMs = peakDuration * 40;  // convert samples to milliseconds
+
+        // --- NEW FEATURE 2: rise_rate ---
+        // How quickly did the magnitude rise to the peak? (mg per millisecond)
+        // Find the last sample before the peak that was below 50% of peak.
+        var threshold50 = peakMag * 0.5;
+        var riseStartIdx = peakIdx;
+        for (var i = peakIdx - 1; i >= 0; i--) {
+            if ((_magBuffer[i] as Float) < threshold50) { riseStartIdx = i; break; }
+        }
+        var riseSamples = peakIdx - riseStartIdx;
+        var riseRate = 0.0 as Float;
+        if (riseSamples > 0) {
+            riseRate = (peakMag - (_magBuffer[riseStartIdx] as Float)) / (riseSamples * 40).toFloat();
+        }
+
+        // --- NEW FEATURE 3: peak_count ---
+        // How many times does the signal cross above meanMag + 1 std?
+        // Shots: 1 clear crossing. Walking: many small crossings.
+        var crossThreshold = meanMag + stdMag;
+        var peakCount = 0;
+        var abovePrev = false;
+        for (var i = 0; i < n; i++) {
+            var above = (_magBuffer[i] as Float) > crossThreshold;
+            if (above && !abovePrev) { peakCount++; }
+            abovePrev = above;
+        }
+
+        // --- NEW FEATURE 4: pre_stillness ---
+        // Mean of the previous 3 seconds' mean magnitudes.
+        // Low = standing still (addressing the ball), high = walking.
+        var preStillness = meanMag;  // default to current if no history
+        if (_recentMeans.size() > 0) {
+            var preSum = 0.0 as Float;
+            var preN = _recentMeans.size();
+            for (var i = 0; i < preN; i++) {
+                preSum += _recentMeans[i] as Float;
+            }
+            preStillness = preSum / preN.toFloat();
+        }
+        // Update rolling buffer (keep last 3 seconds)
+        _recentMeans.add(meanMag);
+        if (_recentMeans.size() > 3) {
+            _recentMeans = _recentMeans.slice(1, null) as Array<Float>;
+        }
+
+        // --- Write all fields to FIT ---
         if (_fPeakMag != null) { _fPeakMag.setData(peakMag); }
         if (_fMinMag != null) { _fMinMag.setData(minMag); }
         if (_fMeanMag != null) { _fMeanMag.setData(meanMag); }
@@ -207,9 +275,11 @@ class SwingLoggerView extends WatchUi.View {
         if (_fPeakX != null) { _fPeakX.setData(_peakX); }
         if (_fPeakY != null) { _fPeakY.setData(_peakY); }
         if (_fPeakZ != null) { _fPeakZ.setData(_peakZ); }
+        if (_fPeakDuration != null) { _fPeakDuration.setData(peakDurationMs); }
+        if (_fRiseRate != null) { _fRiseRate.setData(riseRate); }
+        if (_fPeakCount != null) { _fPeakCount.setData(peakCount); }
+        if (_fPreStillness != null) { _fPreStillness.setData(preStillness); }
 
-        // Write shot marker: the running shot count if marked this second, 0 otherwise.
-        // This means in the FIT file, shot_marker > 0 indicates the second a shot was confirmed.
         if (_fShotMarker != null) {
             if (_shotMarked) {
                 _fShotMarker.setData(_shotCount);
@@ -271,12 +341,25 @@ class SwingLoggerView extends WatchUi.View {
         _fShotMarker = _session.createField("shot_marker", 8,
             FitContributor.DATA_TYPE_SINT16,
             {:mesgType => FitContributor.MESG_TYPE_RECORD, :units => ""});
+        _fPeakDuration = _session.createField("peak_duration", 9,
+            FitContributor.DATA_TYPE_SINT16,
+            {:mesgType => FitContributor.MESG_TYPE_RECORD, :units => "ms"});
+        _fRiseRate = _session.createField("rise_rate", 10,
+            FitContributor.DATA_TYPE_FLOAT,
+            {:mesgType => FitContributor.MESG_TYPE_RECORD, :units => "mg/ms"});
+        _fPeakCount = _session.createField("peak_count", 11,
+            FitContributor.DATA_TYPE_SINT16,
+            {:mesgType => FitContributor.MESG_TYPE_RECORD, :units => ""});
+        _fPreStillness = _session.createField("pre_stillness", 12,
+            FitContributor.DATA_TYPE_FLOAT,
+            {:mesgType => FitContributor.MESG_TYPE_RECORD, :units => "mg"});
 
         _session.start();
         _recording = true;
         _seconds = 0;
         _shotCount = 0;
         _shotMarked = false;
+        _recentMeans = [] as Array<Float>;
         _magBuffer = [] as Array<Float>;
         _peakX = 0;
         _peakY = 0;
