@@ -138,29 +138,71 @@ def extract_shots(df):
 
 
 def classify_shots(sdf, holes_data):
-    """Classify each shot as pitch/chip/putt and assign to a hole."""
-    classes = []
+    """Classify each shot as pitch/chip/putt and assign to a hole.
+
+    Uses three signals:
+    1. Accelerometer: peak_mag > PITCH_THRESHOLD = pitch
+    2. GPS: inside green polygon/radius = putt
+    3. Temporal ordering: within each hole, the sequence is always
+       pitch → chip(s) → putt(s). Once a putt is detected, all
+       remaining shots in the hole must also be putts. Shots before
+       the first putt that aren't pitches are chips.
+
+    This resolves the fringe ambiguity: a shot near the green edge
+    that GPS calls "on green" but appears before any confirmed putt
+    is reclassified as a chip (still approaching). Conversely, a shot
+    GPS calls "off green" that appears after a confirmed putt stays
+    as a putt (GPS noise on the green edge).
+    """
+    # --- Pass 1: assign holes (pitch = new hole start) ---
     hole_assignments = []
     current_hole = -1
 
     for i, row in sdf.iterrows():
-        on_green = find_green(row["lat"], row["lon"], holes_data)
-        is_pitch = row["peak_mag"] > PITCH_THRESHOLD
-
-        if is_pitch:
-            shot_class = "pitch"
+        if row["peak_mag"] > PITCH_THRESHOLD:
             nearest_h, _ = find_nearest_tee(row["lat"], row["lon"], holes_data)
             current_hole = nearest_h
-        elif on_green is not None:
-            shot_class = "putt"
-        else:
-            shot_class = "chip"
-
-        classes.append(shot_class)
         hole_assignments.append(current_hole)
 
-    sdf["class"] = classes
     sdf["hole"] = hole_assignments
+
+    # --- Pass 2: classify using backwards-from-end green check ---
+    # In P&P the shot order is always: pitch → chip(s) → putt(s).
+    # Putts come LAST in a hole. So we work backwards from the last shot:
+    #   1. Starting from the last non-pitch shot, check if GPS says on/near green.
+    #   2. Keep marking as putt while GPS confirms green proximity.
+    #   3. Stop when we hit a shot that GPS says is clearly off-green.
+    #   4. Everything between the pitch and the first putt = chip.
+    # This prevents chips near the green (early in the hole) from being
+    # falsely tagged as putts — only the trailing shots get the generous check.
+    for h in sdf["hole"].unique():
+        if h < 0:
+            continue
+        hole_indices = sdf[sdf["hole"] == h].index.tolist()
+
+        # Work backwards: find how many trailing shots are on/near green
+        putt_count_from_end = 0
+        for idx in reversed(hole_indices):
+            if sdf.at[idx, "peak_mag"] > PITCH_THRESHOLD:
+                break  # hit the pitch going backwards — stop
+            on_green = find_green(sdf.at[idx, "lat"], sdf.at[idx, "lon"], holes_data)
+            if on_green is not None:
+                putt_count_from_end += 1
+            else:
+                break  # first off-green shot going backwards — stop
+
+        # Assign classes: last N shots = putt, rest = chip, first = pitch
+        n_shots = len(hole_indices)
+        first_putt_pos = n_shots - putt_count_from_end
+
+        for pos, idx in enumerate(hole_indices):
+            if sdf.at[idx, "peak_mag"] > PITCH_THRESHOLD:
+                sdf.at[idx, "class"] = "pitch"
+            elif pos >= first_putt_pos:
+                sdf.at[idx, "class"] = "putt"
+            else:
+                sdf.at[idx, "class"] = "chip"
+
     return sdf
 
 
