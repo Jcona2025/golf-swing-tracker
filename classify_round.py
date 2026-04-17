@@ -123,7 +123,7 @@ def extract_shots(df):
         if len(w) == 0:
             continue
         peak = w.loc[w["peak_mag"].idxmax()]
-        shots.append({
+        shot = {
             "marker": int(m["shot_marker"]),
             "marker_t": m["t"],
             "peak_t": peak["t"],
@@ -132,7 +132,12 @@ def extract_shots(df):
             "max_jerk": peak["max_jerk"],
             "lat": m["lat"] if pd.notna(m["lat"]) else peak["lat"],
             "lon": m["lon"] if pd.notna(m["lon"]) else peak["lon"],
-        })
+        }
+        # New high-res features (only present in FIT files recorded after
+        # the v3 watch app update). Older files will have these as NaN.
+        for feat in ["peak_duration", "rise_rate", "peak_count", "pre_stillness"]:
+            shot[feat] = peak[feat] if feat in peak.index else None
+        shots.append(shot)
 
     return pd.DataFrame(shots)
 
@@ -201,6 +206,36 @@ def classify_shots(sdf, holes_data):
             elif pos >= first_putt_pos:
                 sdf.at[idx, "class"] = "putt"
             else:
+                sdf.at[idx, "class"] = "chip"
+
+        # --- Pass 3: chip safety net using new temporal features ---
+        # A shot GPS-classified as putt but with a chip-like temporal
+        # signature (long impact duration + zero rise rate) is likely
+        # a chip played near the green fringe that GPS misclassified.
+        # Only flip the FIRST putt(s) — once confirmed putting starts,
+        # subsequent shots stay as putts (player is on the green).
+        # Requires the new features (peak_duration + rise_rate) to be
+        # populated; older FIT files are unaffected.
+        for pos, idx in enumerate(hole_indices):
+            if sdf.at[idx, "class"] != "putt":
+                continue
+            # Only check shots BEFORE any confirmed putt that came via
+            # a strict polygon match
+            row = sdf.loc[idx]
+            if pd.isna(row.get("peak_duration")) or pd.isna(row.get("rise_rate")):
+                break  # No new features available — skip safety net
+            # Chip signature: long duration AND zero rise rate
+            chip_like = (row["peak_duration"] >= 160) and (row["rise_rate"] == 0)
+            if not chip_like:
+                break  # Found a real putt — stop safety net for this hole
+            # Check if GPS was strict (on polygon) or loose (centroid fallback)
+            strict_on_green = False
+            for hd in holes_data:
+                if point_in_polygon(row["lat"], row["lon"], hd["green_polygon"]):
+                    strict_on_green = True
+                    break
+            if not strict_on_green:
+                # Reclassify as chip
                 sdf.at[idx, "class"] = "chip"
 
     return sdf
