@@ -19,15 +19,16 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 <style>
   * { box-sizing: border-box; }
-  html, body { margin: 0; padding: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+  html, body { margin: 0; padding: 0; width: 100%; height: 100vh; overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
   #header {
     background: #1d3557; color: white; padding: 10px 14px;
-    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+    width: 100%; height: 54px; z-index: 1000;
     box-shadow: 0 2px 8px rgba(0,0,0,0.2);
   }
   #header h1 { margin: 0; font-size: 16px; font-weight: 600; }
   #header .stats { font-size: 12px; opacity: 0.85; margin-top: 2px; }
-  #map { position: absolute; top: 54px; bottom: 0; left: 0; right: 0; }
+  #map { width: 100%; height: calc(100vh - 54px); }
   #legend {
     position: absolute; bottom: 20px; left: 10px; z-index: 1000;
     background: rgba(255,255,255,0.95); padding: 8px 10px; border-radius: 6px;
