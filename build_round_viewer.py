@@ -63,7 +63,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
   <div class="item"><span class="dot" style="background:#e63946"></span>Pitch</div>
   <div class="item"><span class="dot" style="background:#f4a261"></span>Chip</div>
   <div class="item"><span class="dot" style="background:#2a9d8f"></span>Putt</div>
-  <div class="item"><span class="dot" style="background:#264653"></span>Tee</div>
+  <div class="item" style="font-size:10px;color:#666;margin-top:4px">Shot 1 = tee shot</div>
 </div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
@@ -89,26 +89,49 @@ GEOJSON.features.forEach(f => {
   if (g.type === 'Polygon' && p.kind === 'green') {
     const coords = g.coordinates[0].map(c => [c[1], c[0]]);
     bounds.push(...coords);
+    const areaStr = p.area_m2 ? `${p.area_m2.toFixed(1)}m&sup2;` : '';
+    const idxStr = p.index ? ` (idx ${p.index})` : '';
     L.polygon(coords, {
       color: '#2a9d8f', weight: 2, fillColor: '#7fc97f', fillOpacity: 0.35
-    }).addTo(layers).bindPopup(`<div class="shot-popup"><b>Green H${p.hole}</b>${p.distance_m}m</div>`);
+    }).addTo(layers).bindPopup(
+      `<div class="shot-popup"><b>Hole ${p.hole} green</b>` +
+      `Hole: ${p.distance_m}m${idxStr}<br>` +
+      `Green area: ${areaStr}</div>`
+    );
   } else if (g.type === 'LineString' && p.kind === 'gps_trail') {
     const coords = g.coordinates.map(c => [c[1], c[0]]);
     L.polyline(coords, { color: '#1d3557', weight: 2, opacity: 0.55 }).addTo(layers);
-  } else if (g.type === 'Point' && p.kind === 'tee') {
-    const icon = L.divIcon({
-      className: 'leaflet-div-icon-tee', html: p.hole
-    });
-    L.marker([g.coordinates[1], g.coordinates[0]], { icon }).addTo(layers)
-      .bindPopup(`<div class="shot-popup"><b>H${p.hole} tee</b>${p.distance_m}m</div>`);
   } else if (g.type === 'Point' && p.kind === 'shot') {
     const color = SHOT_COLORS[p.shot_class] || '#888';
     const icon = L.divIcon({
       className: 'leaflet-div-icon-shot',
       html: `<div style="background:${color};width:100%;height:100%;border-radius:50%;display:flex;align-items:center;justify-content:center">${p.shot_num_in_hole}</div>`
     });
+
+    // Build popup content based on shot type + available data
+    let popup = `<div class="shot-popup"><b>H${p.hole} shot ${p.shot_num_in_hole} — ${p.shot_class}</b>`;
+    if (p.shot_num_in_hole === 1 && p.hole_distance_m !== undefined) {
+      popup += `Hole: ${p.hole_distance_m}m (index ${p.hole_index})<br>`;
+      popup += `Green area: ${p.green_area_m2.toFixed(1)}m&sup2;<br>`;
+    } else {
+      if (p.dist_from_prev_m !== undefined) {
+        popup += `Travel: ${p.dist_from_prev_m}m from previous shot<br>`;
+      }
+      if (p.dist_to_green_m !== undefined) {
+        popup += `To green: ${p.dist_to_green_m}m<br>`;
+      }
+    }
+    popup += `<hr style="margin:4px 0;border:0;border-top:1px solid #ddd">`;
+    popup += `<span style="font-size:11px;color:#666">`;
+    popup += `peak_mag: ${p.peak_mag}mg`;
+    if (p.peak_duration !== undefined) popup += ` &middot; dur: ${p.peak_duration}ms`;
+    if (p.rise_rate !== undefined) popup += `<br>rise_rate: ${p.rise_rate}mg/ms`;
+    if (p.peak_count !== undefined) popup += ` &middot; peaks: ${p.peak_count}`;
+    if (p.pre_stillness !== undefined) popup += `<br>pre_stillness: ${p.pre_stillness}mg`;
+    popup += `</span></div>`;
+
     L.marker([g.coordinates[1], g.coordinates[0]], { icon }).addTo(layers)
-      .bindPopup(`<div class="shot-popup"><b>H${p.hole} shot ${p.shot_num_in_hole}</b>${p.shot_class} &middot; ${p.peak_mag}mg</div>`);
+      .bindPopup(popup);
   }
 });
 
