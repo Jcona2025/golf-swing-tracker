@@ -142,9 +142,16 @@ def main():
     parser.add_argument("fit_file")
     parser.add_argument("course_json")
     parser.add_argument("--output", default=None)
+    parser.add_argument("--exclude-markers", default=None,
+                        help="Comma-separated shot markers to exclude (e.g. temp holes, accidental presses)")
     args = parser.parse_args()
 
     output = args.output or args.fit_file.rsplit(".", 1)[0] + "_overlay.geojson"
+
+    excluded = set()
+    if args.exclude_markers:
+        excluded = {int(m.strip()) for m in args.exclude_markers.split(",") if m.strip()}
+        print(f"Excluding markers: {sorted(excluded)}")
 
     print(f"Loading {args.fit_file}...")
     df = load_round(args.fit_file)
@@ -154,6 +161,8 @@ def main():
     holes_data = course["holes"]
 
     sdf = extract_shots(df)
+    if excluded:
+        sdf = sdf[~sdf["marker"].isin(excluded)].reset_index(drop=True)
     print(f"Shots detected: {len(sdf)}")
     sdf = classify_shots(sdf, holes_data)
 
