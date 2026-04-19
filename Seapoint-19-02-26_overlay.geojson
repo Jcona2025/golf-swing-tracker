@@ -84,7 +84,13 @@
         "fill": "#7fc97f",
         "fill-opacity": 0.35,
         "stroke": "#2a9d8f",
-        "stroke-width": 2
+        "stroke-width": 2,
+        "score": 2,
+        "n_putts": 1,
+        "n_chips": 0,
+        "pitch_on_green": true,
+        "pitch_to_green_m": 2.1,
+        "up_and_down": false
       }
     },
     {
@@ -145,7 +151,13 @@
         "fill": "#7fc97f",
         "fill-opacity": 0.35,
         "stroke": "#2a9d8f",
-        "stroke-width": 2
+        "stroke-width": 2,
+        "score": 3,
+        "n_putts": 2,
+        "n_chips": 0,
+        "pitch_on_green": true,
+        "pitch_to_green_m": 4.4,
+        "up_and_down": false
       }
     },
     {
@@ -202,7 +214,13 @@
         "fill": "#7fc97f",
         "fill-opacity": 0.35,
         "stroke": "#2a9d8f",
-        "stroke-width": 2
+        "stroke-width": 2,
+        "score": 3,
+        "n_putts": 2,
+        "n_chips": 0,
+        "pitch_on_green": true,
+        "pitch_to_green_m": 5.7,
+        "up_and_down": false
       }
     },
     {
@@ -279,7 +297,13 @@
         "fill": "#7fc97f",
         "fill-opacity": 0.35,
         "stroke": "#2a9d8f",
-        "stroke-width": 2
+        "stroke-width": 2,
+        "score": 3,
+        "n_putts": 2,
+        "n_chips": 0,
+        "pitch_on_green": true,
+        "pitch_to_green_m": 8.3,
+        "up_and_down": false
       }
     },
     {
@@ -376,7 +400,13 @@
         "fill": "#7fc97f",
         "fill-opacity": 0.35,
         "stroke": "#2a9d8f",
-        "stroke-width": 2
+        "stroke-width": 2,
+        "score": 3,
+        "n_putts": 2,
+        "n_chips": 0,
+        "pitch_on_green": true,
+        "pitch_to_green_m": 2.3,
+        "up_and_down": false
       }
     },
     {
@@ -465,7 +495,13 @@
         "fill": "#7fc97f",
         "fill-opacity": 0.35,
         "stroke": "#2a9d8f",
-        "stroke-width": 2
+        "stroke-width": 2,
+        "score": 3,
+        "n_putts": 2,
+        "n_chips": 0,
+        "pitch_on_green": true,
+        "pitch_to_green_m": 3.2,
+        "up_and_down": false
       }
     },
     {
@@ -562,7 +598,13 @@
         "fill": "#7fc97f",
         "fill-opacity": 0.35,
         "stroke": "#2a9d8f",
-        "stroke-width": 2
+        "stroke-width": 2,
+        "score": 2,
+        "n_putts": 1,
+        "n_chips": 0,
+        "pitch_on_green": true,
+        "pitch_to_green_m": 5.7,
+        "up_and_down": false
       }
     },
     {
@@ -639,7 +681,13 @@
         "fill": "#7fc97f",
         "fill-opacity": 0.35,
         "stroke": "#2a9d8f",
-        "stroke-width": 2
+        "stroke-width": 2,
+        "score": 3,
+        "n_putts": 2,
+        "n_chips": 0,
+        "pitch_on_green": true,
+        "pitch_to_green_m": 7.1,
+        "up_and_down": false
       }
     },
     {
@@ -732,7 +780,13 @@
         "fill": "#7fc97f",
         "fill-opacity": 0.35,
         "stroke": "#2a9d8f",
-        "stroke-width": 2
+        "stroke-width": 2,
+        "score": 3,
+        "n_putts": 1,
+        "n_chips": 1,
+        "pitch_on_green": false,
+        "pitch_to_green_m": 9.8,
+        "up_and_down": true
       }
     },
     {
@@ -809,7 +863,13 @@
         "fill": "#7fc97f",
         "fill-opacity": 0.35,
         "stroke": "#2a9d8f",
-        "stroke-width": 2
+        "stroke-width": 2,
+        "score": 3,
+        "n_putts": 2,
+        "n_chips": 0,
+        "pitch_on_green": true,
+        "pitch_to_green_m": 5.7,
+        "up_and_down": false
       }
     },
     {
@@ -894,7 +954,13 @@
         "fill": "#7fc97f",
         "fill-opacity": 0.35,
         "stroke": "#2a9d8f",
-        "stroke-width": 2
+        "stroke-width": 2,
+        "score": 3,
+        "n_putts": 1,
+        "n_chips": 1,
+        "pitch_on_green": false,
+        "pitch_to_green_m": 8.9,
+        "up_and_down": true
       }
     },
     {
@@ -979,7 +1045,13 @@
         "fill": "#7fc97f",
         "fill-opacity": 0.35,
         "stroke": "#2a9d8f",
-        "stroke-width": 2
+        "stroke-width": 2,
+        "score": 3,
+        "n_putts": 2,
+        "n_chips": 0,
+        "pitch_on_green": true,
+        "pitch_to_green_m": 6.0,
+        "up_and_down": false
       }
     },
     {
@@ -1056,7 +1128,13 @@
         "fill": "#7fc97f",
         "fill-opacity": 0.35,
         "stroke": "#2a9d8f",
-        "stroke-width": 2
+        "stroke-width": 2,
+        "score": 3,
+        "n_putts": 1,
+        "n_chips": 1,
+        "pitch_on_green": false,
+        "pitch_to_green_m": 10.3,
+        "up_and_down": true
       }
     },
     {
@@ -1133,7 +1211,13 @@
         "fill": "#7fc97f",
         "fill-opacity": 0.35,
         "stroke": "#2a9d8f",
-        "stroke-width": 2
+        "stroke-width": 2,
+        "score": 2,
+        "n_putts": 1,
+        "n_chips": 0,
+        "pitch_on_green": true,
+        "pitch_to_green_m": 3.8,
+        "up_and_down": false
       }
     },
     {
@@ -1242,7 +1326,13 @@
         "fill": "#7fc97f",
         "fill-opacity": 0.35,
         "stroke": "#2a9d8f",
-        "stroke-width": 2
+        "stroke-width": 2,
+        "score": 2,
+        "n_putts": 1,
+        "n_chips": 0,
+        "pitch_on_green": true,
+        "pitch_to_green_m": 3.6,
+        "up_and_down": false
       }
     },
     {
@@ -1367,7 +1457,13 @@
         "fill": "#7fc97f",
         "fill-opacity": 0.35,
         "stroke": "#2a9d8f",
-        "stroke-width": 2
+        "stroke-width": 2,
+        "score": 4,
+        "n_putts": 2,
+        "n_chips": 1,
+        "pitch_on_green": false,
+        "pitch_to_green_m": 25.3,
+        "up_and_down": false
       }
     },
     {
@@ -1452,7 +1548,13 @@
         "fill": "#7fc97f",
         "fill-opacity": 0.35,
         "stroke": "#2a9d8f",
-        "stroke-width": 2
+        "stroke-width": 2,
+        "score": 3,
+        "n_putts": 2,
+        "n_chips": 0,
+        "pitch_on_green": true,
+        "pitch_to_green_m": 3.9,
+        "up_and_down": false
       }
     },
     {
@@ -1549,7 +1651,13 @@
         "fill": "#7fc97f",
         "fill-opacity": 0.35,
         "stroke": "#2a9d8f",
-        "stroke-width": 2
+        "stroke-width": 2,
+        "score": 3,
+        "n_putts": 2,
+        "n_chips": 0,
+        "pitch_on_green": true,
+        "pitch_to_green_m": 8.2,
+        "up_and_down": false
       }
     },
     {
@@ -11388,7 +11496,9 @@
         "hole_distance_m": 47,
         "hole_index": 7,
         "green_area_m2": 61.58,
-        "title": "H1 tee &middot; pitch &middot; 47m"
+        "pitch_on_green": true,
+        "pitch_result_m": 2.1,
+        "title": "H1 tee &middot; pitch"
       }
     },
     {
@@ -11416,6 +11526,7 @@
         "pre_stillness": 1026.0,
         "dist_from_prev_m": 46.6,
         "dist_to_green_m": 2.1,
+        "putt_made": true,
         "title": "H1 shot 2 &middot; putt"
       }
     },
@@ -11445,7 +11556,9 @@
         "hole_distance_m": 55,
         "hole_index": 3,
         "green_area_m2": 41.39,
-        "title": "H2 tee &middot; pitch &middot; 55m"
+        "pitch_on_green": true,
+        "pitch_result_m": 4.4,
+        "title": "H2 tee &middot; pitch"
       }
     },
     {
@@ -11473,6 +11586,7 @@
         "pre_stillness": 1023.8,
         "dist_from_prev_m": 56.3,
         "dist_to_green_m": 4.4,
+        "putt_made": false,
         "title": "H2 shot 2 &middot; putt"
       }
     },
@@ -11501,6 +11615,7 @@
         "pre_stillness": 1030.1,
         "dist_from_prev_m": 2.5,
         "dist_to_green_m": 3.8,
+        "putt_made": true,
         "title": "H2 shot 3 &middot; putt"
       }
     },
@@ -11530,7 +11645,9 @@
         "hole_distance_m": 47,
         "hole_index": 13,
         "green_area_m2": 77.79,
-        "title": "H3 tee &middot; pitch &middot; 47m"
+        "pitch_on_green": true,
+        "pitch_result_m": 5.7,
+        "title": "H3 tee &middot; pitch"
       }
     },
     {
@@ -11558,6 +11675,7 @@
         "pre_stillness": 1051.9,
         "dist_from_prev_m": 55.3,
         "dist_to_green_m": 5.7,
+        "putt_made": false,
         "title": "H3 shot 2 &middot; putt"
       }
     },
@@ -11586,6 +11704,7 @@
         "pre_stillness": 1032.0,
         "dist_from_prev_m": 13.0,
         "dist_to_green_m": 7.3,
+        "putt_made": true,
         "title": "H3 shot 3 &middot; putt"
       }
     },
@@ -11615,7 +11734,9 @@
         "hole_distance_m": 51,
         "hole_index": 11,
         "green_area_m2": 37.25,
-        "title": "H4 tee &middot; pitch &middot; 51m"
+        "pitch_on_green": true,
+        "pitch_result_m": 8.3,
+        "title": "H4 tee &middot; pitch"
       }
     },
     {
@@ -11643,6 +11764,7 @@
         "pre_stillness": 1026.1,
         "dist_from_prev_m": 54.9,
         "dist_to_green_m": 8.3,
+        "putt_made": false,
         "title": "H4 shot 2 &middot; putt"
       }
     },
@@ -11671,6 +11793,7 @@
         "pre_stillness": 1024.2,
         "dist_from_prev_m": 4.9,
         "dist_to_green_m": 8.1,
+        "putt_made": true,
         "title": "H4 shot 3 &middot; putt"
       }
     },
@@ -11700,7 +11823,9 @@
         "hole_distance_m": 52,
         "hole_index": 17,
         "green_area_m2": 40.93,
-        "title": "H5 tee &middot; pitch &middot; 52m"
+        "pitch_on_green": true,
+        "pitch_result_m": 2.3,
+        "title": "H5 tee &middot; pitch"
       }
     },
     {
@@ -11728,6 +11853,7 @@
         "pre_stillness": 1017.3,
         "dist_from_prev_m": 49.6,
         "dist_to_green_m": 2.3,
+        "putt_made": false,
         "title": "H5 shot 2 &middot; putt"
       }
     },
@@ -11756,6 +11882,7 @@
         "pre_stillness": 1017.3,
         "dist_from_prev_m": 2.7,
         "dist_to_green_m": 0.6,
+        "putt_made": true,
         "title": "H5 shot 3 &middot; putt"
       }
     },
@@ -11785,7 +11912,9 @@
         "hole_distance_m": 55,
         "hole_index": 1,
         "green_area_m2": 49.67,
-        "title": "H6 tee &middot; pitch &middot; 55m"
+        "pitch_on_green": true,
+        "pitch_result_m": 3.2,
+        "title": "H6 tee &middot; pitch"
       }
     },
     {
@@ -11813,6 +11942,7 @@
         "pre_stillness": 1034.9,
         "dist_from_prev_m": 61.0,
         "dist_to_green_m": 3.2,
+        "putt_made": false,
         "title": "H6 shot 2 &middot; putt"
       }
     },
@@ -11841,6 +11971,7 @@
         "pre_stillness": 1038.2,
         "dist_from_prev_m": 3.3,
         "dist_to_green_m": 4.3,
+        "putt_made": true,
         "title": "H6 shot 3 &middot; putt"
       }
     },
@@ -11870,7 +12001,9 @@
         "hole_distance_m": 30,
         "hole_index": 15,
         "green_area_m2": 40.0,
-        "title": "H7 tee &middot; pitch &middot; 30m"
+        "pitch_on_green": true,
+        "pitch_result_m": 5.7,
+        "title": "H7 tee &middot; pitch"
       }
     },
     {
@@ -11898,6 +12031,7 @@
         "pre_stillness": 1009.3,
         "dist_from_prev_m": 28.3,
         "dist_to_green_m": 5.7,
+        "putt_made": true,
         "title": "H7 shot 2 &middot; putt"
       }
     },
@@ -11927,7 +12061,9 @@
         "hole_distance_m": 44,
         "hole_index": 5,
         "green_area_m2": 35.28,
-        "title": "H8 tee &middot; pitch &middot; 44m"
+        "pitch_on_green": true,
+        "pitch_result_m": 7.1,
+        "title": "H8 tee &middot; pitch"
       }
     },
     {
@@ -11955,6 +12091,7 @@
         "pre_stillness": 1081.4,
         "dist_from_prev_m": 47.7,
         "dist_to_green_m": 7.1,
+        "putt_made": false,
         "title": "H8 shot 2 &middot; putt"
       }
     },
@@ -11983,6 +12120,7 @@
         "pre_stillness": 1024.2,
         "dist_from_prev_m": 2.2,
         "dist_to_green_m": 4.9,
+        "putt_made": true,
         "title": "H8 shot 3 &middot; putt"
       }
     },
@@ -12012,7 +12150,9 @@
         "hole_distance_m": 59,
         "hole_index": 9,
         "green_area_m2": 31.18,
-        "title": "H9 tee &middot; pitch &middot; 59m"
+        "pitch_on_green": false,
+        "pitch_result_m": 9.8,
+        "title": "H9 tee &middot; pitch"
       }
     },
     {
@@ -12068,6 +12208,7 @@
         "pre_stillness": 1049.2,
         "dist_from_prev_m": 3.1,
         "dist_to_green_m": 9.2,
+        "putt_made": true,
         "title": "H9 shot 3 &middot; putt"
       }
     },
@@ -12097,7 +12238,9 @@
         "hole_distance_m": 55,
         "hole_index": 8,
         "green_area_m2": 54.48,
-        "title": "H10 tee &middot; pitch &middot; 55m"
+        "pitch_on_green": true,
+        "pitch_result_m": 5.7,
+        "title": "H10 tee &middot; pitch"
       }
     },
     {
@@ -12125,6 +12268,7 @@
         "pre_stillness": 1029.1,
         "dist_from_prev_m": 59.9,
         "dist_to_green_m": 5.7,
+        "putt_made": false,
         "title": "H10 shot 2 &middot; putt"
       }
     },
@@ -12153,6 +12297,7 @@
         "pre_stillness": 1034.5,
         "dist_from_prev_m": 4.0,
         "dist_to_green_m": 8.0,
+        "putt_made": true,
         "title": "H10 shot 3 &middot; putt"
       }
     },
@@ -12182,7 +12327,9 @@
         "hole_distance_m": 56,
         "hole_index": 4,
         "green_area_m2": 29.97,
-        "title": "H11 tee &middot; pitch &middot; 56m"
+        "pitch_on_green": false,
+        "pitch_result_m": 8.9,
+        "title": "H11 tee &middot; pitch"
       }
     },
     {
@@ -12238,6 +12385,7 @@
         "pre_stillness": 1032.4,
         "dist_from_prev_m": 5.1,
         "dist_to_green_m": 3.8,
+        "putt_made": true,
         "title": "H11 shot 3 &middot; putt"
       }
     },
@@ -12267,7 +12415,9 @@
         "hole_distance_m": 56,
         "hole_index": 12,
         "green_area_m2": 78.73,
-        "title": "H12 tee &middot; pitch &middot; 56m"
+        "pitch_on_green": true,
+        "pitch_result_m": 6.0,
+        "title": "H12 tee &middot; pitch"
       }
     },
     {
@@ -12295,6 +12445,7 @@
         "pre_stillness": 1029.2,
         "dist_from_prev_m": 61.4,
         "dist_to_green_m": 6.0,
+        "putt_made": false,
         "title": "H12 shot 2 &middot; putt"
       }
     },
@@ -12323,6 +12474,7 @@
         "pre_stillness": 1044.0,
         "dist_from_prev_m": 2.2,
         "dist_to_green_m": 4.0,
+        "putt_made": true,
         "title": "H12 shot 3 &middot; putt"
       }
     },
@@ -12352,7 +12504,9 @@
         "hole_distance_m": 49,
         "hole_index": 18,
         "green_area_m2": 35.67,
-        "title": "H13 tee &middot; pitch &middot; 49m"
+        "pitch_on_green": false,
+        "pitch_result_m": 10.3,
+        "title": "H13 tee &middot; pitch"
       }
     },
     {
@@ -12408,6 +12562,7 @@
         "pre_stillness": 1044.9,
         "dist_from_prev_m": 12.4,
         "dist_to_green_m": 4.6,
+        "putt_made": true,
         "title": "H13 shot 3 &middot; putt"
       }
     },
@@ -12437,7 +12592,9 @@
         "hole_distance_m": 54,
         "hole_index": 16,
         "green_area_m2": 50.11,
-        "title": "H14 tee &middot; pitch &middot; 54m"
+        "pitch_on_green": true,
+        "pitch_result_m": 3.8,
+        "title": "H14 tee &middot; pitch"
       }
     },
     {
@@ -12465,6 +12622,7 @@
         "pre_stillness": 1037.5,
         "dist_from_prev_m": 59.0,
         "dist_to_green_m": 3.8,
+        "putt_made": true,
         "title": "H14 shot 2 &middot; putt"
       }
     },
@@ -12494,7 +12652,9 @@
         "hole_distance_m": 43,
         "hole_index": 14,
         "green_area_m2": 50.26,
-        "title": "H15 tee &middot; pitch &middot; 43m"
+        "pitch_on_green": true,
+        "pitch_result_m": 3.6,
+        "title": "H15 tee &middot; pitch"
       }
     },
     {
@@ -12522,6 +12682,7 @@
         "pre_stillness": 1024.0,
         "dist_from_prev_m": 45.7,
         "dist_to_green_m": 3.6,
+        "putt_made": true,
         "title": "H15 shot 2 &middot; putt"
       }
     },
@@ -12551,7 +12712,9 @@
         "hole_distance_m": 59,
         "hole_index": 2,
         "green_area_m2": 45.88,
-        "title": "H16 tee &middot; pitch &middot; 59m"
+        "pitch_on_green": false,
+        "pitch_result_m": 25.3,
+        "title": "H16 tee &middot; pitch"
       }
     },
     {
@@ -12607,6 +12770,7 @@
         "pre_stillness": 1061.7,
         "dist_from_prev_m": 17.4,
         "dist_to_green_m": 8.1,
+        "putt_made": false,
         "title": "H16 shot 3 &middot; putt"
       }
     },
@@ -12635,6 +12799,7 @@
         "pre_stillness": 1019.1,
         "dist_from_prev_m": 10.8,
         "dist_to_green_m": 8.6,
+        "putt_made": true,
         "title": "H16 shot 4 &middot; putt"
       }
     },
@@ -12664,7 +12829,9 @@
         "hole_distance_m": 60,
         "hole_index": 10,
         "green_area_m2": 58.15,
-        "title": "H17 tee &middot; pitch &middot; 60m"
+        "pitch_on_green": true,
+        "pitch_result_m": 3.9,
+        "title": "H17 tee &middot; pitch"
       }
     },
     {
@@ -12692,6 +12859,7 @@
         "pre_stillness": 1026.3,
         "dist_from_prev_m": 64.6,
         "dist_to_green_m": 3.9,
+        "putt_made": false,
         "title": "H17 shot 2 &middot; putt"
       }
     },
@@ -12720,6 +12888,7 @@
         "pre_stillness": 1026.3,
         "dist_from_prev_m": 1.1,
         "dist_to_green_m": 2.9,
+        "putt_made": true,
         "title": "H17 shot 3 &middot; putt"
       }
     },
@@ -12749,7 +12918,9 @@
         "hole_distance_m": 63,
         "hole_index": 6,
         "green_area_m2": 42.84,
-        "title": "H18 tee &middot; pitch &middot; 63m"
+        "pitch_on_green": true,
+        "pitch_result_m": 8.2,
+        "title": "H18 tee &middot; pitch"
       }
     },
     {
@@ -12777,6 +12948,7 @@
         "pre_stillness": 1016.9,
         "dist_from_prev_m": 78.3,
         "dist_to_green_m": 8.2,
+        "putt_made": false,
         "title": "H18 shot 2 &middot; putt"
       }
     },
@@ -12805,6 +12977,7 @@
         "pre_stillness": 1008.4,
         "dist_from_prev_m": 12.8,
         "dist_to_green_m": 5.0,
+        "putt_made": true,
         "title": "H18 shot 3 &middot; putt"
       }
     }

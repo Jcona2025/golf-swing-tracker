@@ -22,13 +22,13 @@ HTML_TEMPLATE = """<!DOCTYPE html>
   html, body { margin: 0; padding: 0; width: 100%; height: 100vh; overflow: hidden;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
   #header {
-    background: #1d3557; color: white; padding: 10px 14px;
-    width: 100%; height: 54px; z-index: 1000;
+    background: #1d3557; color: white; padding: 8px 14px;
+    width: 100%; height: 66px; z-index: 1000;
     box-shadow: 0 2px 8px rgba(0,0,0,0.2);
   }
-  #header h1 { margin: 0; font-size: 16px; font-weight: 600; }
-  #header .stats { font-size: 12px; opacity: 0.85; margin-top: 2px; }
-  #map { width: 100%; height: calc(100vh - 54px); }
+  #header h1 { margin: 0; font-size: 15px; font-weight: 600; }
+  #header .stats { font-size: 11px; opacity: 0.85; margin-top: 2px; line-height: 1.3; }
+  #map { width: 100%; height: calc(100vh - 66px); }
   #legend {
     position: absolute; bottom: 20px; left: 10px; z-index: 1000;
     background: rgba(255,255,255,0.95); padding: 8px 10px; border-radius: 6px;
@@ -89,15 +89,34 @@ GEOJSON.features.forEach(f => {
   if (g.type === 'Polygon' && p.kind === 'green') {
     const coords = g.coordinates[0].map(c => [c[1], c[0]]);
     bounds.push(...coords);
-    const areaStr = p.area_m2 ? `${p.area_m2.toFixed(1)}m&sup2;` : '';
-    const idxStr = p.index ? ` (idx ${p.index})` : '';
     L.polygon(coords, {
       color: '#2a9d8f', weight: 2, fillColor: '#7fc97f', fillOpacity: 0.35
-    }).addTo(layers).bindPopup(
-      `<div class="shot-popup"><b>Hole ${p.hole} green</b>` +
-      `Hole: ${p.distance_m}m${idxStr}<br>` +
-      `Green area: ${areaStr}</div>`
-    );
+    }).addTo(layers).bindPopup(() => {
+      let html = `<div class="shot-popup"><b>Hole ${p.hole}</b>`;
+      html += `Distance: ${p.distance_m}m &middot; Index: ${p.index}<br>`;
+      html += `Green area: ${p.area_m2.toFixed(1)}m&sup2;<br>`;
+      if (p.score !== undefined) {
+        html += `<hr style="margin:4px 0;border:0;border-top:1px solid #ddd">`;
+        html += `<b>Score: ${p.score}</b>`;
+        if (p.n_putts) html += ` &middot; ${p.n_putts} putt${p.n_putts>1?'s':''}`;
+        if (p.n_chips) html += ` &middot; ${p.n_chips} chip${p.n_chips>1?'s':''}`;
+        html += '<br>';
+        if (p.pitch_on_green !== undefined) {
+          const tick = p.pitch_on_green ? '✓' : '✗';
+          const color = p.pitch_on_green ? '#2a9d8f' : '#e63946';
+          html += `<span style="color:${color}">Pitch on green: ${tick}</span>`;
+          if (p.pitch_to_green_m !== undefined) {
+            html += ` (${p.pitch_to_green_m}m from pin)`;
+          }
+          html += '<br>';
+        }
+        if (p.up_and_down) {
+          html += `<span style="color:#2a9d8f">✓ Up-and-down</span>`;
+        }
+      }
+      html += '</div>';
+      return html;
+    });
   } else if (g.type === 'LineString' && p.kind === 'gps_trail') {
     const coords = g.coordinates.map(c => [c[1], c[0]]);
     L.polyline(coords, { color: '#1d3557', weight: 2, opacity: 0.55 }).addTo(layers);
@@ -111,14 +130,27 @@ GEOJSON.features.forEach(f => {
     // Build popup content based on shot type + available data
     let popup = `<div class="shot-popup"><b>H${p.hole} shot ${p.shot_num_in_hole} — ${p.shot_class}</b>`;
     if (p.shot_num_in_hole === 1 && p.hole_distance_m !== undefined) {
-      popup += `Hole: ${p.hole_distance_m}m (index ${p.hole_index})<br>`;
-      popup += `Green area: ${p.green_area_m2.toFixed(1)}m&sup2;<br>`;
+      popup += `Hole: ${p.hole_distance_m}m &middot; index ${p.hole_index}<br>`;
+      if (p.pitch_on_green !== undefined) {
+        const tick = p.pitch_on_green ? '✓ Hit green' : '✗ Missed green';
+        const color = p.pitch_on_green ? '#2a9d8f' : '#e63946';
+        popup += `<span style="color:${color}">${tick}</span>`;
+        if (p.pitch_result_m !== undefined) {
+          popup += ` (${p.pitch_result_m}m from pin)`;
+        }
+        popup += '<br>';
+      }
     } else {
       if (p.dist_from_prev_m !== undefined) {
         popup += `Travel: ${p.dist_from_prev_m}m from previous shot<br>`;
       }
       if (p.dist_to_green_m !== undefined) {
         popup += `To green: ${p.dist_to_green_m}m<br>`;
+      }
+      if (p.putt_made !== undefined) {
+        const tick = p.putt_made ? '✓ Made' : '✗ Missed';
+        const color = p.putt_made ? '#2a9d8f' : '#e63946';
+        popup += `<span style="color:${color}">${tick}</span><br>`;
       }
     }
     popup += `<hr style="margin:4px 0;border:0;border-top:1px solid #ddd">`;
@@ -159,8 +191,20 @@ def main():
     n_putt  = sum(1 for f in geojson["features"] if f["properties"].get("shot_class") == "putt")
     total = n_pitch + n_chip + n_putt
 
+    # Richer round-level stats from the green polygon features
+    greens = [f["properties"] for f in geojson["features"] if f["properties"].get("kind") == "green"]
+    pitches_on_green = sum(1 for g in greens if g.get("pitch_on_green") is True)
+    pitches_played = sum(1 for g in greens if g.get("pitch_on_green") is not None)
+    up_and_downs = sum(1 for g in greens if g.get("up_and_down") is True)
+    holes_played = sum(1 for g in greens if g.get("score") is not None)
+    avg_putts = (n_putt / holes_played) if holes_played else 0
+
     title = args.title or geojson.get("name", "Round overlay")
-    stats = f"Score: {total} &middot; {n_pitch} pitches, {n_chip} chips, {n_putt} putts"
+    stats_line1 = f"Score: <b>{total}</b> &middot; {n_pitch}P, {n_chip}C, {n_putt}Pu"
+    stats_line2 = (f"Greens hit: {pitches_on_green}/{pitches_played} &middot; "
+                   f"Putts/hole: {avg_putts:.1f} &middot; "
+                   f"Up-and-downs: {up_and_downs}")
+    stats = f"{stats_line1}<br>{stats_line2}"
 
     html = (HTML_TEMPLATE
             .replace("__TITLE__", title)
