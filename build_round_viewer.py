@@ -106,7 +106,7 @@ GEOJSON.features.forEach(f => {
           const color = p.pitch_on_green ? '#2a9d8f' : '#e63946';
           html += `<span style="color:${color}">Pitch on green: ${tick}</span>`;
           if (p.pitch_to_green_m !== undefined) {
-            html += ` (${p.pitch_to_green_m}m from pin)`;
+            html += ` (${p.pitch_to_green_m}m from green centre)`;
           }
           html += '<br>';
         }
@@ -136,7 +136,7 @@ GEOJSON.features.forEach(f => {
         const color = p.pitch_on_green ? '#2a9d8f' : '#e63946';
         popup += `<span style="color:${color}">${tick}</span>`;
         if (p.pitch_result_m !== undefined) {
-          popup += ` (${p.pitch_result_m}m from pin)`;
+          popup += ` (${p.pitch_result_m}m from green centre)`;
         }
         popup += '<br>';
       }
@@ -145,7 +145,7 @@ GEOJSON.features.forEach(f => {
         popup += `Travel: ${p.dist_from_prev_m}m from previous shot<br>`;
       }
       if (p.dist_to_green_m !== undefined) {
-        popup += `To green: ${p.dist_to_green_m}m<br>`;
+        popup += `To green centre: ${p.dist_to_green_m}m<br>`;
       }
       if (p.putt_made !== undefined) {
         const tick = p.putt_made ? '✓ Made' : '✗ Missed';
