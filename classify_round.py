@@ -256,15 +256,12 @@ def classify_shots(sdf, holes_data):
         for pos, idx in enumerate(hole_indices):
             if sdf.at[idx, "class"] != "putt":
                 continue
-            # Only check shots BEFORE any confirmed putt that came via
-            # a strict polygon match
             row = sdf.loc[idx]
             if pd.isna(row.get("peak_duration")) or pd.isna(row.get("rise_rate")):
-                break  # No new features available — skip safety net
-            # Chip signature: long duration AND zero rise rate
+                break
             chip_like = (row["peak_duration"] >= 160) and (row["rise_rate"] == 0)
             if not chip_like:
-                break  # Found a real putt — stop safety net for this hole
+                break
             # Check if GPS was strict (on polygon) or loose (centroid fallback)
             strict_on_green = False
             for hd in holes_data:
@@ -272,7 +269,6 @@ def classify_shots(sdf, holes_data):
                     strict_on_green = True
                     break
             if not strict_on_green:
-                # Reclassify as chip
                 sdf.at[idx, "class"] = "chip"
 
     return sdf
