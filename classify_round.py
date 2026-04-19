@@ -159,14 +159,46 @@ def classify_shots(sdf, holes_data):
     GPS calls "off green" that appears after a confirmed putt stays
     as a putt (GPS noise on the green edge).
     """
-    # --- Pass 1: assign holes (pitch = new hole start) ---
+    # --- Pass 1: assign holes ---
+    # A new hole starts when:
+    #   (a) peak_mag > PITCH_THRESHOLD (a normal wedge pitch), OR
+    #   (b) the shot is within TEE_PROXIMITY_M of a DIFFERENT hole's tee
+    #       AND we've already seen a putt on the current hole.
+    # Rule (b) handles soft tee shots (iron, not wedge) that don't
+    # register as pitches. The "post-putt" guard is critical on tight
+    # P&P courses where chips frequently happen near adjacent tees —
+    # those chips come BEFORE any putt so they don't trigger (b).
+    TEE_PROXIMITY_M = 8
+
     hole_assignments = []
     current_hole = -1
+    current_hole_has_putt = False
 
     for i, row in sdf.iterrows():
+        lat, lon = row["lat"], row["lon"]
+        if pd.isna(lat) or pd.isna(lon):
+            hole_assignments.append(current_hole)
+            continue
+
+        new_hole = False
         if row["peak_mag"] > PITCH_THRESHOLD:
-            nearest_h, _ = find_nearest_tee(row["lat"], row["lon"], holes_data)
+            new_hole = True
+        elif current_hole_has_putt:
+            nearest_h, nearest_d = find_nearest_tee(lat, lon, holes_data)
+            if nearest_d <= TEE_PROXIMITY_M and nearest_h != current_hole:
+                new_hole = True
+
+        if new_hole:
+            nearest_h, _ = find_nearest_tee(lat, lon, holes_data)
             current_hole = nearest_h
+            current_hole_has_putt = False
+        else:
+            # Check if THIS shot is a putt on the current hole's green
+            # (used to gate rule (b) for subsequent shots).
+            on_green = find_green(lat, lon, holes_data)
+            if on_green == current_hole:
+                current_hole_has_putt = True
+
         hole_assignments.append(current_hole)
 
     sdf["hole"] = hole_assignments
@@ -196,12 +228,17 @@ def classify_shots(sdf, holes_data):
             else:
                 break  # first off-green shot going backwards — stop
 
-        # Assign classes: last N shots = putt, rest = chip, first = pitch
+        # Assign classes: first = pitch, last N = putt, rest = chip.
+        # The first shot of a hole is always the tee shot (pitch), even
+        # if peak_mag is below PITCH_THRESHOLD — this handles soft tee
+        # shots played with an iron/putter on very short holes.
         n_shots = len(hole_indices)
         first_putt_pos = n_shots - putt_count_from_end
 
         for pos, idx in enumerate(hole_indices):
-            if sdf.at[idx, "peak_mag"] > PITCH_THRESHOLD:
+            if pos == 0:
+                sdf.at[idx, "class"] = "pitch"
+            elif sdf.at[idx, "peak_mag"] > PITCH_THRESHOLD:
                 sdf.at[idx, "class"] = "pitch"
             elif pos >= first_putt_pos:
                 sdf.at[idx, "class"] = "putt"

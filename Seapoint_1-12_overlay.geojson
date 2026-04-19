@@ -9680,10 +9680,10 @@
         "kind": "shot",
         "hole": 13,
         "shot_num_in_hole": 2,
-        "shot_class": "chip",
+        "shot_class": "putt",
         "marker_global": 36,
         "peak_mag": 1615.0,
-        "marker-color": "#f4a261",
+        "marker-color": "#2a9d8f",
         "marker-symbol": "2",
         "marker-size": "medium",
         "peak_duration": 40.0,
@@ -9692,7 +9692,7 @@
         "pre_stillness": 1024.9,
         "dist_from_prev_m": 49.5,
         "dist_to_green_m": 1.9,
-        "title": "H13 shot 2 &middot; chip"
+        "title": "H13 shot 2 &middot; putt"
       }
     },
     {
@@ -9700,27 +9700,28 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -6.246606716886163,
-          53.76309486106038
+          -6.246663,
+          53.7630941
         ]
       },
       "properties": {
         "kind": "shot",
-        "hole": 13,
-        "shot_num_in_hole": 3,
-        "shot_class": "chip",
+        "hole": 14,
+        "shot_num_in_hole": 1,
+        "shot_class": "pitch",
         "marker_global": 38,
         "peak_mag": 1841.0,
-        "marker-color": "#f4a261",
-        "marker-symbol": "3",
+        "marker-color": "#e63946",
+        "marker-symbol": "1",
         "marker-size": "medium",
         "peak_duration": 40.0,
         "rise_rate": 7.9,
         "peak_count": 2.0,
         "pre_stillness": 1084.7,
-        "dist_from_prev_m": 32.9,
-        "dist_to_green_m": 34.0,
-        "title": "H13 shot 3 &middot; chip"
+        "hole_distance_m": 54,
+        "hole_index": 16,
+        "green_area_m2": 50.11,
+        "title": "H14 tee &middot; pitch &middot; 54m"
       }
     },
     {
@@ -9734,21 +9735,21 @@
       },
       "properties": {
         "kind": "shot",
-        "hole": 13,
-        "shot_num_in_hole": 4,
+        "hole": 14,
+        "shot_num_in_hole": 2,
         "shot_class": "putt",
         "marker_global": 39,
         "peak_mag": 1629.0,
         "marker-color": "#2a9d8f",
-        "marker-symbol": "4",
+        "marker-symbol": "2",
         "marker-size": "medium",
         "peak_duration": 80.0,
         "rise_rate": 0.0,
         "peak_count": 1.0,
         "pre_stillness": 1056.9,
         "dist_from_prev_m": 56.3,
-        "dist_to_green_m": 66.4,
-        "title": "H13 shot 4 &middot; putt"
+        "dist_to_green_m": 2.2,
+        "title": "H14 shot 2 &middot; putt"
       }
     },
     {
