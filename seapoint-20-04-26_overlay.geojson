@@ -1459,9 +1459,9 @@
         "stroke": "#2a9d8f",
         "stroke-width": 2,
         "score": 3,
-        "n_putts": 0,
-        "n_chips": 2,
-        "pitch_on_green": false,
+        "n_putts": 2,
+        "n_chips": 0,
+        "pitch_on_green": true,
         "pitch_to_green_m": 6.9,
         "up_and_down": false
       }
@@ -1653,9 +1653,9 @@
         "stroke": "#2a9d8f",
         "stroke-width": 2,
         "score": 3,
-        "n_putts": 0,
-        "n_chips": 2,
-        "pitch_on_green": false,
+        "n_putts": 2,
+        "n_chips": 0,
+        "pitch_on_green": true,
         "pitch_to_green_m": 1.3,
         "up_and_down": false
       }
@@ -10865,7 +10865,7 @@
         "hole_distance_m": 59,
         "hole_index": 2,
         "green_area_m2": 45.88,
-        "pitch_on_green": false,
+        "pitch_on_green": true,
         "pitch_result_m": 6.9,
         "title": "H16 tee &middot; pitch"
       }
@@ -10883,10 +10883,10 @@
         "kind": "shot",
         "hole": 16,
         "shot_num_in_hole": 2,
-        "shot_class": "chip",
+        "shot_class": "putt",
         "marker_global": 43,
         "peak_mag": 2006.0,
-        "marker-color": "#f4a261",
+        "marker-color": "#2a9d8f",
         "marker-symbol": "2",
         "marker-size": "medium",
         "peak_duration": 80.0,
@@ -10895,7 +10895,8 @@
         "pre_stillness": 1036.8,
         "dist_from_prev_m": 69.1,
         "dist_to_green_m": 6.9,
-        "title": "H16 shot 2 &middot; chip"
+        "putt_made": false,
+        "title": "H16 shot 2 &middot; putt"
       }
     },
     {
@@ -10911,10 +10912,10 @@
         "kind": "shot",
         "hole": 16,
         "shot_num_in_hole": 3,
-        "shot_class": "chip",
+        "shot_class": "putt",
         "marker_global": 44,
         "peak_mag": 1878.0,
-        "marker-color": "#f4a261",
+        "marker-color": "#2a9d8f",
         "marker-symbol": "3",
         "marker-size": "medium",
         "peak_duration": 80.0,
@@ -10923,7 +10924,8 @@
         "pre_stillness": 1034.3,
         "dist_from_prev_m": 7.1,
         "dist_to_green_m": 9.3,
-        "title": "H16 shot 3 &middot; chip"
+        "putt_made": true,
+        "title": "H16 shot 3 &middot; putt"
       }
     },
     {
@@ -11041,7 +11043,7 @@
         "hole_distance_m": 63,
         "hole_index": 6,
         "green_area_m2": 42.84,
-        "pitch_on_green": false,
+        "pitch_on_green": true,
         "pitch_result_m": 1.3,
         "title": "H18 tee &middot; pitch"
       }
@@ -11059,10 +11061,10 @@
         "kind": "shot",
         "hole": 18,
         "shot_num_in_hole": 2,
-        "shot_class": "chip",
+        "shot_class": "putt",
         "marker_global": 49,
         "peak_mag": 1370.0,
-        "marker-color": "#f4a261",
+        "marker-color": "#2a9d8f",
         "marker-symbol": "2",
         "marker-size": "medium",
         "peak_duration": 80.0,
@@ -11071,7 +11073,8 @@
         "pre_stillness": 1027.3,
         "dist_from_prev_m": 71.6,
         "dist_to_green_m": 1.3,
-        "title": "H18 shot 2 &middot; chip"
+        "putt_made": false,
+        "title": "H18 shot 2 &middot; putt"
       }
     },
     {
@@ -11087,10 +11090,10 @@
         "kind": "shot",
         "hole": 18,
         "shot_num_in_hole": 3,
-        "shot_class": "chip",
+        "shot_class": "putt",
         "marker_global": 50,
         "peak_mag": 1590.0,
-        "marker-color": "#f4a261",
+        "marker-color": "#2a9d8f",
         "marker-symbol": "3",
         "marker-size": "medium",
         "peak_duration": 280.0,
@@ -11099,7 +11102,8 @@
         "pre_stillness": 1034.1,
         "dist_from_prev_m": 9.5,
         "dist_to_green_m": 10.7,
-        "title": "H18 shot 3 &middot; chip"
+        "putt_made": true,
+        "title": "H18 shot 3 &middot; putt"
       }
     }
   ]
