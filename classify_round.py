@@ -203,44 +203,44 @@ def classify_shots(sdf, holes_data):
 
     sdf["hole"] = hole_assignments
 
-    # --- Pass 2: classify using backwards-from-end green check ---
-    # In P&P the shot order is always: pitch → chip(s) → putt(s).
-    # Putts come LAST in a hole. So we work backwards from the last shot:
-    #   1. Starting from the last non-pitch shot, check if GPS says on/near green.
-    #   2. Keep marking as putt while GPS confirms green proximity.
-    #   3. Stop when we hit a shot that GPS says is clearly off-green.
-    #   4. Everything between the pitch and the first putt = chip.
-    # This prevents chips near the green (early in the hole) from being
-    # falsely tagged as putts — only the trailing shots get the generous check.
+    # --- Pass 2: classify using forward green-start scan ---
+    # In P&P the shot order is always: pitch → chip(s) → putt(s). Once the
+    # player reaches the green, they stay on it until the ball is holed.
+    # So we scan forward and find the FIRST shot that's strictly inside a
+    # green polygon — from that point on, every shot is a putt, even if
+    # GPS drifts off-green on gentle tap-ins.
+    #
+    # If no shot is strictly in a polygon (but some are in the centroid+
+    # buffer), fall back to the generous on-green check to avoid missing
+    # all putts on a hole.
+    #
+    # The first shot of a hole is always the tee shot (pitch), even if
+    # peak_mag is below PITCH_THRESHOLD — handles soft tee shots (iron,
+    # putter) on very short holes.
     for h in sdf["hole"].unique():
         if h < 0:
             continue
         hole_indices = sdf[sdf["hole"] == h].index.tolist()
 
-        # Work backwards: find how many trailing shots are on/near green
-        putt_count_from_end = 0
-        for idx in reversed(hole_indices):
+        # Find the FIRST shot classified as on-green (generous check).
+        # This is the transition from approach to putting — everything from
+        # here onward is a putt even if later GPS drifts off (e.g., gentle
+        # tap-ins that lose GPS resolution).
+        first_putt_pos = None
+        for pos, idx in enumerate(hole_indices[1:], start=1):
             if sdf.at[idx, "peak_mag"] > PITCH_THRESHOLD:
-                break  # hit the pitch going backwards — stop
+                continue
             on_green = find_green(sdf.at[idx, "lat"], sdf.at[idx, "lon"], holes_data)
             if on_green is not None:
-                putt_count_from_end += 1
-            else:
-                break  # first off-green shot going backwards — stop
-
-        # Assign classes: first = pitch, last N = putt, rest = chip.
-        # The first shot of a hole is always the tee shot (pitch), even
-        # if peak_mag is below PITCH_THRESHOLD — this handles soft tee
-        # shots played with an iron/putter on very short holes.
-        n_shots = len(hole_indices)
-        first_putt_pos = n_shots - putt_count_from_end
+                first_putt_pos = pos
+                break
 
         for pos, idx in enumerate(hole_indices):
             if pos == 0:
                 sdf.at[idx, "class"] = "pitch"
             elif sdf.at[idx, "peak_mag"] > PITCH_THRESHOLD:
                 sdf.at[idx, "class"] = "pitch"
-            elif pos >= first_putt_pos:
+            elif first_putt_pos is not None and pos >= first_putt_pos:
                 sdf.at[idx, "class"] = "putt"
             else:
                 sdf.at[idx, "class"] = "chip"
