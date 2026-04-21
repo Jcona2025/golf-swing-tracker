@@ -1046,8 +1046,8 @@
         "fill-opacity": 0.35,
         "stroke": "#2a9d8f",
         "stroke-width": 2,
-        "score": 5,
-        "n_putts": 4,
+        "score": 3,
+        "n_putts": 2,
         "n_chips": 0,
         "pitch_on_green": true,
         "pitch_to_green_m": 4.5,
@@ -1128,7 +1128,13 @@
         "fill": "#7fc97f",
         "fill-opacity": 0.35,
         "stroke": "#2a9d8f",
-        "stroke-width": 2
+        "stroke-width": 2,
+        "score": 2,
+        "n_putts": 1,
+        "n_chips": 0,
+        "pitch_on_green": true,
+        "pitch_to_green_m": 5.3,
+        "up_and_down": false
       }
     },
     {
@@ -11067,7 +11073,7 @@
         "pre_stillness": 1024.7,
         "dist_from_prev_m": 6.0,
         "dist_to_green_m": 1.6,
-        "putt_made": false,
+        "putt_made": true,
         "title": "H12 shot 3 &middot; putt"
       }
     },
@@ -11076,28 +11082,30 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -6.246904861181974,
-          53.763380432501435
+          -6.2461608,
+          53.7631443
         ]
       },
       "properties": {
         "kind": "shot",
-        "hole": 12,
-        "shot_num_in_hole": 4,
-        "shot_class": "putt",
+        "hole": 13,
+        "shot_num_in_hole": 1,
+        "shot_class": "pitch",
         "marker_global": 39,
         "peak_mag": 1971.0,
-        "marker-color": "#2a9d8f",
-        "marker-symbol": "4",
+        "marker-color": "#e63946",
+        "marker-symbol": "1",
         "marker-size": "medium",
         "peak_duration": 40.0,
         "rise_rate": 12.6,
         "peak_count": 1.0,
         "pre_stillness": 1035.2,
-        "dist_from_prev_m": 23.6,
-        "dist_to_green_m": 24.5,
-        "putt_made": false,
-        "title": "H12 shot 4 &middot; putt"
+        "hole_distance_m": 49,
+        "hole_index": 18,
+        "green_area_m2": 35.67,
+        "pitch_on_green": true,
+        "pitch_result_m": 5.3,
+        "title": "H13 tee &middot; pitch"
       }
     },
     {
@@ -11111,22 +11119,22 @@
       },
       "properties": {
         "kind": "shot",
-        "hole": 12,
-        "shot_num_in_hole": 5,
+        "hole": 13,
+        "shot_num_in_hole": 2,
         "shot_class": "putt",
         "marker_global": 40,
         "peak_mag": 1766.0,
         "marker-color": "#2a9d8f",
-        "marker-symbol": "5",
+        "marker-symbol": "2",
         "marker-size": "medium",
         "peak_duration": 80.0,
         "rise_rate": 12.9,
         "peak_count": 1.0,
         "pre_stillness": 1031.8,
         "dist_from_prev_m": 7.2,
-        "dist_to_green_m": 26.2,
+        "dist_to_green_m": 5.3,
         "putt_made": true,
-        "title": "H12 shot 5 &middot; putt"
+        "title": "H13 shot 2 &middot; putt"
       }
     },
     {

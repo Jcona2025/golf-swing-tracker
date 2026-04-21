@@ -160,19 +160,27 @@ def classify_shots(sdf, holes_data):
     as a putt (GPS noise on the green edge).
     """
     # --- Pass 1: assign holes ---
-    # A new hole starts when:
-    #   (a) peak_mag > PITCH_THRESHOLD (a normal wedge pitch), OR
-    #   (b) the shot is within TEE_PROXIMITY_M of a DIFFERENT hole's tee
-    #       AND we've already seen a putt on the current hole.
-    # Rule (b) handles soft tee shots (iron, not wedge) that don't
-    # register as pitches. The "post-putt" guard is critical on tight
-    # P&P courses where chips frequently happen near adjacent tees —
-    # those chips come BEFORE any putt so they don't trigger (b).
+    # A new hole starts when ANY of:
+    #   (a) peak_mag > PITCH_THRESHOLD — a normal wedge pitch.
+    #   (b) the shot is within TEE_PROXIMITY_M of a different hole's tee
+    #       AND the current hole already had a putt. Handles the case
+    #       where a soft tee shot is pressed while standing at the tee.
+    #   (c) the PREVIOUS shot was a strict-polygon putt, AND this shot
+    #       is >30s later, AND this shot is NOT on any green. Handles
+    #       soft tee shots pressed after walking to the ball — the hole
+    #       is definitively complete after a strict-on-green putt, so
+    #       the next off-green shot has to be a new hole's tee shot.
+    #       The time-gap guard prevents a tap-in's GPS-drifted follow-up
+    #       from wrongly triggering this.
+    # Assumes holes are played sequentially (N → N+1) for rule (c).
     TEE_PROXIMITY_M = 8
+    HOLE_TRANSITION_GAP_S = 30
 
     hole_assignments = []
     current_hole = -1
     current_hole_has_putt = False
+    last_strict_on_green_time = None
+    last_t = None
 
     for i, row in sdf.iterrows():
         lat, lon = row["lat"], row["lon"]
@@ -181,24 +189,58 @@ def classify_shots(sdf, holes_data):
             continue
 
         new_hole = False
+        new_hole_number = None
+
+        # Rule (d): shot strictly inside a DIFFERENT hole's polygon.
+        # This is the strongest signal — if the GPS puts the shot inside
+        # another hole's green, we're definitively on that hole now.
+        # Handles the case where a soft tee shot wasn't pressed (so we
+        # missed the "pitch" signal) and the first press is the approach
+        # putt already on the new hole's green.
+        strict_match_hole = None
+        for hd in holes_data:
+            if point_in_polygon(lat, lon, hd["green_polygon"]):
+                strict_match_hole = hd["hole"]
+                break
+
         if row["peak_mag"] > PITCH_THRESHOLD:
             new_hole = True
+            nearest_h, _ = find_nearest_tee(lat, lon, holes_data)
+            new_hole_number = nearest_h
+        elif strict_match_hole is not None and strict_match_hole != current_hole:
+            new_hole = True
+            new_hole_number = strict_match_hole
         elif current_hole_has_putt:
             nearest_h, nearest_d = find_nearest_tee(lat, lon, holes_data)
             if nearest_d <= TEE_PROXIMITY_M and nearest_h != current_hole:
                 new_hole = True
+                new_hole_number = nearest_h
+        # Rule (c): after a strict-polygon putt + walk + off-green shot
+        if (not new_hole
+                and last_strict_on_green_time is not None
+                and last_t is not None
+                and (row["marker_t"] - last_strict_on_green_time) > HOLE_TRANSITION_GAP_S):
+            if find_green(lat, lon, holes_data) is None:
+                new_hole = True
+                new_hole_number = current_hole + 1 if 1 <= current_hole < 18 else -1
 
         if new_hole:
-            nearest_h, _ = find_nearest_tee(lat, lon, holes_data)
-            current_hole = nearest_h
+            current_hole = new_hole_number
             current_hole_has_putt = False
+            last_strict_on_green_time = None
         else:
-            # Check if THIS shot is a putt on the current hole's green
-            # (used to gate rule (b) for subsequent shots).
+            # Check if THIS shot is a putt strictly on the current hole's green
+            strict_on = any(
+                point_in_polygon(lat, lon, hd["green_polygon"])
+                for hd in holes_data
+            )
+            if strict_on:
+                last_strict_on_green_time = row["marker_t"]
             on_green = find_green(lat, lon, holes_data)
             if on_green == current_hole:
                 current_hole_has_putt = True
 
+        last_t = row["marker_t"]
         hole_assignments.append(current_hole)
 
     sdf["hole"] = hole_assignments
