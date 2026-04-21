@@ -1,0 +1,13 @@
+{
+  "_comment": "Round 6 (21 April 2026) — Seapoint. User missed 2 button presses.",
+  "reclassify": [
+    {"marker": 39, "class": "putt",
+     "_note": "Was labelled pitch as 'first shot of H13' but actually the 2nd shot (1st putt). The synthetic pitch insert takes the 1st-shot role."}
+  ],
+  "insert_shots": [
+    {"hole": 13, "position": 1, "class": "pitch",
+     "_note": "Missed press on H13 soft iron tee shot"},
+    {"hole": 18, "position": 4, "class": "putt",
+     "_note": "Missed press on H18 hole-out tap-in"}
+  ]
+}

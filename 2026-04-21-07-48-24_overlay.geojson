@@ -1129,11 +1129,11 @@
         "fill-opacity": 0.35,
         "stroke": "#2a9d8f",
         "stroke-width": 2,
-        "score": 2,
-        "n_putts": 1,
+        "score": 3,
+        "n_putts": 2,
         "n_chips": 0,
         "pitch_on_green": true,
-        "pitch_to_green_m": 5.3,
+        "pitch_to_green_m": 4.5,
         "up_and_down": false
       }
     },
@@ -1652,12 +1652,12 @@
         "fill-opacity": 0.35,
         "stroke": "#2a9d8f",
         "stroke-width": 2,
-        "score": 3,
-        "n_putts": 1,
+        "score": 4,
+        "n_putts": 2,
         "n_chips": 1,
         "pitch_on_green": false,
         "pitch_to_green_m": 8.4,
-        "up_and_down": true
+        "up_and_down": false
       }
     },
     {
@@ -11091,21 +11091,46 @@
         "hole": 13,
         "shot_num_in_hole": 1,
         "shot_class": "pitch",
-        "marker_global": 39,
-        "peak_mag": 1971.0,
+        "marker_global": 10000,
+        "peak_mag": 0.0,
         "marker-color": "#e63946",
         "marker-symbol": "1",
+        "marker-size": "medium",
+        "hole_distance_m": 49,
+        "hole_index": 18,
+        "green_area_m2": 35.67,
+        "pitch_on_green": true,
+        "pitch_result_m": 4.5,
+        "title": "H13 tee &middot; pitch"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -6.246904861181974,
+          53.763380432501435
+        ]
+      },
+      "properties": {
+        "kind": "shot",
+        "hole": 13,
+        "shot_num_in_hole": 2,
+        "shot_class": "putt",
+        "marker_global": 39,
+        "peak_mag": 1971.0,
+        "marker-color": "#2a9d8f",
+        "marker-symbol": "2",
         "marker-size": "medium",
         "peak_duration": 40.0,
         "rise_rate": 12.6,
         "peak_count": 1.0,
         "pre_stillness": 1035.2,
-        "hole_distance_m": 49,
-        "hole_index": 18,
-        "green_area_m2": 35.67,
-        "pitch_on_green": true,
-        "pitch_result_m": 5.3,
-        "title": "H13 tee &middot; pitch"
+        "dist_from_prev_m": 3.6,
+        "dist_to_green_m": 4.5,
+        "putt_made": false,
+        "title": "H13 shot 2 &middot; putt"
       }
     },
     {
@@ -11120,12 +11145,12 @@
       "properties": {
         "kind": "shot",
         "hole": 13,
-        "shot_num_in_hole": 2,
+        "shot_num_in_hole": 3,
         "shot_class": "putt",
         "marker_global": 40,
         "peak_mag": 1766.0,
         "marker-color": "#2a9d8f",
-        "marker-symbol": "2",
+        "marker-symbol": "3",
         "marker-size": "medium",
         "peak_duration": 80.0,
         "rise_rate": 12.9,
@@ -11134,7 +11159,7 @@
         "dist_from_prev_m": 7.2,
         "dist_to_green_m": 5.3,
         "putt_made": true,
-        "title": "H13 shot 2 &middot; putt"
+        "title": "H13 shot 3 &middot; putt"
       }
     },
     {
@@ -11573,8 +11598,33 @@
         "pre_stillness": 1021.9,
         "dist_from_prev_m": 2.7,
         "dist_to_green_m": 7.8,
-        "putt_made": true,
+        "putt_made": false,
         "title": "H18 shot 3 &middot; putt"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -6.247606733813882,
+          53.76252053305507
+        ]
+      },
+      "properties": {
+        "kind": "shot",
+        "hole": 18,
+        "shot_num_in_hole": 4,
+        "shot_class": "putt",
+        "marker_global": 10001,
+        "peak_mag": 0.0,
+        "marker-color": "#2a9d8f",
+        "marker-symbol": "4",
+        "marker-size": "medium",
+        "dist_from_prev_m": 20.4,
+        "dist_to_green_m": 27.3,
+        "putt_made": true,
+        "title": "H18 shot 4 &middot; putt"
       }
     }
   ]

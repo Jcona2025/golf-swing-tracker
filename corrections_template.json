@@ -1,0 +1,19 @@
+{
+  "_comment": "Template for round corrections. Copy this file, name it after the round (e.g. seapoint_2026-04-21_corrections.json), and edit to fix any errors you spot in the classifier output.",
+
+  "exclude_markers": [
+    "_comment: marker numbers to drop (double-presses, noise). Example: [33, 44]"
+  ],
+
+  "reclassify": [
+    {"_comment": "Override a shot's type. Example: {'marker': 18, 'class': 'chip'}"}
+  ],
+
+  "reassign_hole": [
+    {"_comment": "Move a shot to a specific hole. Example: {'marker': 39, 'hole': 13}"}
+  ],
+
+  "insert_shots": [
+    {"_comment": "Add a missing shot on a specific hole. 'position' is 1-indexed within the hole. Example: {'hole': 13, 'position': 1, 'class': 'pitch'} inserts a missed pitch as H13's first shot."}
+  ]
+}

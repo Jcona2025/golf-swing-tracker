@@ -327,6 +327,85 @@ def classify_shots(sdf, holes_data):
     return sdf
 
 
+def apply_corrections(sdf, corrections):
+    """Apply manual corrections to a classified shots DataFrame.
+
+    corrections dict schema:
+      exclude_markers: list of marker numbers to drop (double-presses, noise)
+      reclassify:  list of {marker, class} to override shot class
+      reassign_hole: list of {marker, hole} to move a shot to a specific hole
+      insert_shots: list of {hole, position, class} to add a missing shot
+                    (position = 1-indexed within the hole; class = pitch/chip/putt)
+
+    Returns a new DataFrame with the corrections applied.
+    """
+    if not corrections:
+        return sdf
+
+    # 1. Drop excluded markers
+    if corrections.get("exclude_markers"):
+        sdf = sdf[~sdf["marker"].isin(corrections["exclude_markers"])].reset_index(drop=True)
+
+    # 2. Reclassify shots
+    for rc in corrections.get("reclassify", []):
+        mask = sdf["marker"] == rc["marker"]
+        if mask.any():
+            sdf.loc[mask, "class"] = rc["class"]
+
+    # 3. Reassign shots to a different hole
+    for ra in corrections.get("reassign_hole", []):
+        mask = sdf["marker"] == ra["marker"]
+        if mask.any():
+            sdf.loc[mask, "hole"] = ra["hole"]
+
+    # 4. Insert synthetic shots for missed presses
+    #    Position is 1-indexed within the hole. A synthetic shot gets a
+    #    fake marker number (>= 10000) so it can't conflict with real ones.
+    fake_marker = 10000
+    for ins in corrections.get("insert_shots", []):
+        hole = ins["hole"]
+        position = ins.get("position", 1)
+        shot_class = ins["class"]
+        hole_mask = sdf["hole"] == hole
+        hole_rows = sdf[hole_mask].sort_values("marker_t").reset_index(drop=True)
+
+        # Pick a plausible timestamp: between neighbours if possible
+        if position <= 1:
+            t_new = hole_rows["marker_t"].iloc[0] - 30 if len(hole_rows) > 0 else 0
+        elif position > len(hole_rows):
+            t_new = hole_rows["marker_t"].iloc[-1] + 30
+        else:
+            t_new = (hole_rows["marker_t"].iloc[position - 2] + hole_rows["marker_t"].iloc[position - 1]) / 2
+
+        # Pick a plausible location: centroid of surrounding shots
+        if len(hole_rows) > 0:
+            lat_new = hole_rows["lat"].mean()
+            lon_new = hole_rows["lon"].mean()
+        else:
+            lat_new, lon_new = None, None
+
+        new_row = {col: None for col in sdf.columns}
+        new_row.update({
+            "marker": fake_marker,
+            "marker_t": t_new,
+            "peak_t": t_new,
+            "peak_mag": 0.0,
+            "std_mag": 0.0,
+            "max_jerk": 0.0,
+            "lat": lat_new,
+            "lon": lon_new,
+            "hole": hole,
+            "class": shot_class,
+            "synthetic": True,
+        })
+        fake_marker += 1
+        sdf = pd.concat([sdf, pd.DataFrame([new_row])], ignore_index=True)
+
+    # Re-sort by time so per-hole shot ordering is correct
+    sdf = sdf.sort_values(["hole", "marker_t"]).reset_index(drop=True)
+    return sdf
+
+
 def print_scorecard(sdf, course_name="Course", ground_truth=None):
     """Print a per-hole scorecard with shot-type breakdown."""
 
@@ -395,12 +474,20 @@ def main():
     parser.add_argument("fit_file", help="Path to the round FIT file")
     parser.add_argument("course_json", help="Path to the course JSON file")
     parser.add_argument("--output", default=None, help="Save classified shots to CSV")
+    parser.add_argument("--corrections", default=None,
+                        help="Optional JSON file of manual corrections to apply")
     args = parser.parse_args()
 
     # Load course
     course = json.load(open(args.course_json))
     holes_data = course["holes"]
     print(f"Course: {course['name']} ({course['n_holes']} holes)")
+
+    # Load corrections if specified
+    corrections = None
+    if args.corrections:
+        corrections = json.load(open(args.corrections))
+        print(f"Corrections: {args.corrections}")
 
     # Load round
     df = load_round(args.fit_file)
@@ -412,6 +499,12 @@ def main():
     print(f"Shots detected: {len(sdf)}")
 
     sdf = classify_shots(sdf, holes_data)
+
+    # Apply corrections (after classification, before output)
+    if corrections:
+        before = len(sdf)
+        sdf = apply_corrections(sdf, corrections)
+        print(f"Applied corrections: {before} → {len(sdf)} shots")
 
     # Print scorecard
     print_scorecard(sdf, course_name=course["name"])

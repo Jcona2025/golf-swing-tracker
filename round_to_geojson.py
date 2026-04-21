@@ -14,7 +14,7 @@ import pandas as pd
 import json
 import argparse
 from classify_round import (
-    load_round, extract_shots, classify_shots, haversine_m,
+    load_round, extract_shots, classify_shots, haversine_m, apply_corrections,
 )
 
 
@@ -218,15 +218,24 @@ def main():
     parser.add_argument("course_json")
     parser.add_argument("--output", default=None)
     parser.add_argument("--exclude-markers", default=None,
-                        help="Comma-separated shot markers to exclude (e.g. temp holes, accidental presses)")
+                        help="Comma-separated shot markers to exclude")
+    parser.add_argument("--corrections", default=None,
+                        help="JSON file of manual corrections (exclude, reclassify, insert_shots, reassign_hole)")
     args = parser.parse_args()
 
     output = args.output or args.fit_file.rsplit(".", 1)[0] + "_overlay.geojson"
 
-    excluded = set()
+    # Merge --exclude-markers flag into corrections for unified handling
+    corrections = None
+    if args.corrections:
+        corrections = json.load(open(args.corrections))
+        print(f"Corrections: {args.corrections}")
     if args.exclude_markers:
-        excluded = {int(m.strip()) for m in args.exclude_markers.split(",") if m.strip()}
-        print(f"Excluding markers: {sorted(excluded)}")
+        excluded = [int(m.strip()) for m in args.exclude_markers.split(",") if m.strip()]
+        if corrections is None:
+            corrections = {}
+        corrections["exclude_markers"] = corrections.get("exclude_markers", []) + excluded
+        print(f"Excluding markers (CLI): {excluded}")
 
     print(f"Loading {args.fit_file}...")
     df = load_round(args.fit_file)
@@ -236,10 +245,20 @@ def main():
     holes_data = course["holes"]
 
     sdf = extract_shots(df)
-    if excluded:
-        sdf = sdf[~sdf["marker"].isin(excluded)].reset_index(drop=True)
+    # Exclude markers BEFORE classification so hole grouping isn't confused
+    if corrections and corrections.get("exclude_markers"):
+        sdf = sdf[~sdf["marker"].isin(corrections["exclude_markers"])].reset_index(drop=True)
     print(f"Shots detected: {len(sdf)}")
     sdf = classify_shots(sdf, holes_data)
+
+    # Apply reclassify / reassign_hole / insert_shots corrections
+    if corrections:
+        # Don't double-apply exclude_markers since we already did it above
+        post_corrections = {k: v for k, v in corrections.items() if k != "exclude_markers"}
+        if post_corrections:
+            before = len(sdf)
+            sdf = apply_corrections(sdf, post_corrections)
+            print(f"Post-classification corrections: {before} → {len(sdf)} shots")
 
     n_pitch = (sdf["class"] == "pitch").sum()
     n_chip = (sdf["class"] == "chip").sum()
