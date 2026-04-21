@@ -1,0 +1,8 @@
+{
+  "_comment": "Random-holes session at Seapoint, 21 April 2026. User notes: late presses on chip-ins at H3 and H10 created spurious markers. H17 shots were both on the (roughly-traced) temp green but classifier called them chips.",
+  "exclude_markers": [6, 17],
+  "reclassify": [
+    {"marker": 36, "class": "putt", "_note": "On temp H17 green, rough polygon excluded it"},
+    {"marker": 37, "class": "putt", "_note": "On temp H17 green, rough polygon excluded it"}
+  ]
+}

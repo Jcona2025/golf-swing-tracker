@@ -209,9 +209,9 @@
         "fill-opacity": 0.35,
         "stroke": "#2a9d8f",
         "stroke-width": 2,
-        "score": 3,
+        "score": 2,
         "n_putts": 0,
-        "n_chips": 2,
+        "n_chips": 1,
         "pitch_on_green": false,
         "pitch_to_green_m": 13.3,
         "up_and_down": false
@@ -840,9 +840,9 @@
         "fill-opacity": 0.35,
         "stroke": "#2a9d8f",
         "stroke-width": 2,
-        "score": 3,
+        "score": 2,
         "n_putts": 0,
-        "n_chips": 2,
+        "n_chips": 1,
         "pitch_on_green": false,
         "pitch_to_green_m": 13.9,
         "up_and_down": false
@@ -1526,9 +1526,9 @@
         "stroke": "#2a9d8f",
         "stroke-width": 2,
         "score": 3,
-        "n_putts": 0,
-        "n_chips": 2,
-        "pitch_on_green": false,
+        "n_putts": 2,
+        "n_chips": 0,
+        "pitch_on_green": true,
         "pitch_to_green_m": 13.6,
         "up_and_down": false
       }
@@ -7835,34 +7835,6 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -6.246990440413356,
-          53.76362149603665
-        ]
-      },
-      "properties": {
-        "kind": "shot",
-        "hole": 3,
-        "shot_num_in_hole": 3,
-        "shot_class": "chip",
-        "marker_global": 6,
-        "peak_mag": 1740.0,
-        "marker-color": "#f4a261",
-        "marker-symbol": "3",
-        "marker-size": "medium",
-        "peak_duration": 40.0,
-        "rise_rate": 6.8,
-        "peak_count": 1.0,
-        "pre_stillness": 1078.9,
-        "dist_from_prev_m": 8.2,
-        "dist_to_green_m": 11.5,
-        "title": "H3 shot 3 &middot; chip"
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
           -6.2467114,
           53.7642337
         ]
@@ -8151,34 +8123,6 @@
         "dist_from_prev_m": 67.9,
         "dist_to_green_m": 13.9,
         "title": "H10 shot 2 &middot; chip"
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -6.24624939635396,
-          53.76386985182762
-        ]
-      },
-      "properties": {
-        "kind": "shot",
-        "hole": 10,
-        "shot_num_in_hole": 3,
-        "shot_class": "chip",
-        "marker_global": 17,
-        "peak_mag": 2084.0,
-        "marker-color": "#f4a261",
-        "marker-symbol": "3",
-        "marker-size": "medium",
-        "peak_duration": 40.0,
-        "rise_rate": 9.9,
-        "peak_count": 1.0,
-        "pre_stillness": 1070.3,
-        "dist_from_prev_m": 11.3,
-        "dist_to_green_m": 7.2,
-        "title": "H10 shot 3 &middot; chip"
       }
     },
     {
@@ -8709,7 +8653,7 @@
         "hole_distance_m": 60,
         "hole_index": 10,
         "green_area_m2": 58.15,
-        "pitch_on_green": false,
+        "pitch_on_green": true,
         "pitch_result_m": 13.6,
         "title": "H17 tee &middot; pitch"
       }
@@ -8727,10 +8671,10 @@
         "kind": "shot",
         "hole": 17,
         "shot_num_in_hole": 2,
-        "shot_class": "chip",
+        "shot_class": "putt",
         "marker_global": 36,
         "peak_mag": 1643.0,
-        "marker-color": "#f4a261",
+        "marker-color": "#2a9d8f",
         "marker-symbol": "2",
         "marker-size": "medium",
         "peak_duration": 80.0,
@@ -8739,7 +8683,8 @@
         "pre_stillness": 999.7,
         "dist_from_prev_m": 45.3,
         "dist_to_green_m": 13.6,
-        "title": "H17 shot 2 &middot; chip"
+        "putt_made": false,
+        "title": "H17 shot 2 &middot; putt"
       }
     },
     {
@@ -8755,10 +8700,10 @@
         "kind": "shot",
         "hole": 17,
         "shot_num_in_hole": 3,
-        "shot_class": "chip",
+        "shot_class": "putt",
         "marker_global": 37,
         "peak_mag": 1855.0,
-        "marker-color": "#f4a261",
+        "marker-color": "#2a9d8f",
         "marker-symbol": "3",
         "marker-size": "medium",
         "peak_duration": 160.0,
@@ -8767,7 +8712,8 @@
         "pre_stillness": 996.3,
         "dist_from_prev_m": 1.8,
         "dist_to_green_m": 11.8,
-        "title": "H17 shot 3 &middot; chip"
+        "putt_made": true,
+        "title": "H17 shot 3 &middot; putt"
       }
     },
     {
