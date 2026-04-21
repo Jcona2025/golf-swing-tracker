@@ -13,6 +13,8 @@ import pandas as pd
 import numpy as np
 import json
 import math
+import os
+import pickle
 import sys
 import argparse
 
@@ -22,6 +24,10 @@ PITCH_THRESHOLD = 4000      # peak_mag above this = pitch
 PEAK_WINDOW_BEFORE = 6      # seconds to look back from marker for actual impact
 PEAK_WINDOW_AFTER = 1       # seconds to look forward
 GPS_BUFFER = 4              # metres beyond polygon radius for putt fallback
+
+# Path to the trained ML model for chip-vs-putt classification.
+# If present, overrides the rule-based chip/putt logic in classify_shots.
+MODEL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "chip_putt_model.pkl")
 
 
 # === HELPER FUNCTIONS ===
@@ -142,7 +148,7 @@ def extract_shots(df):
     return pd.DataFrame(shots)
 
 
-def classify_shots(sdf, holes_data):
+def classify_shots(sdf, holes_data, use_ml=True):
     """Classify each shot as pitch/chip/putt and assign to a hole.
 
     Uses three signals:
@@ -323,6 +329,75 @@ def classify_shots(sdf, holes_data):
                     break
             if not strict_on_green:
                 sdf.at[idx, "class"] = "chip"
+
+    # --- Pass 4: ML chip/putt override ---
+    # If a trained model is available AND the FIT file has all the new
+    # features, replace the rule-based chip/putt decisions with ML
+    # predictions. Gradient Boosting beat the rule-based classifier
+    # in LOROCV (85.8% vs 81.5%) — see chip_putt_classifier.ipynb.
+    # Pitch detection (peak_mag > 4000) and hole grouping stay rule-based.
+    if use_ml:
+        artifact = load_chip_putt_model()
+        if artifact is not None:
+            sdf = apply_ml_classifier(sdf, holes_data, artifact)
+
+    return sdf
+
+
+def load_chip_putt_model():
+    """Load the trained Gradient Boosting chip-vs-putt model if available."""
+    if not os.path.exists(MODEL_PATH):
+        return None
+    try:
+        with open(MODEL_PATH, "rb") as f:
+            artifact = pickle.load(f)
+        return artifact
+    except Exception as e:
+        print(f"Warning: could not load {MODEL_PATH}: {e}")
+        return None
+
+
+def apply_ml_classifier(sdf, holes_data, artifact):
+    """Override the rule-based chip/putt classifications with ML predictions.
+
+    Only applies to shots currently classified as 'chip' or 'putt' (pitches
+    stay as rule-based). Requires all feature columns to be non-null — if
+    the FIT file predates the v3 features, ML is skipped and rules stand.
+    """
+    model = artifact["model"]
+    feature_cols = artifact["feature_cols"]
+
+    # Build GPS features (dist_to_green, on_green_strict, on_green_buffer)
+    for i, row in sdf.iterrows():
+        lat, lon = row["lat"], row["lon"]
+        if pd.isna(lat) or pd.isna(lon):
+            continue
+        # dist_to_green
+        sdf.at[i, "dist_to_green"] = min(
+            haversine_m(lat, lon, h["green_centroid"]["lat"], h["green_centroid"]["lon"])
+            for h in holes_data
+        )
+        strict = any(point_in_polygon(lat, lon, h["green_polygon"]) for h in holes_data)
+        sdf.at[i, "on_green_strict"] = 1 if strict else 0
+        buf = False
+        for h in holes_data:
+            c = h["green_centroid"]
+            r = math.sqrt(h["gps_polygon_area_m2"] / math.pi) + 4
+            if haversine_m(lat, lon, c["lat"], c["lon"]) <= r:
+                buf = True
+                break
+        sdf.at[i, "on_green_buffer"] = 1 if buf else 0
+
+    # Predict for every chip/putt shot with full features
+    for i, row in sdf.iterrows():
+        if row.get("class") not in ("chip", "putt"):
+            continue
+        # Require all features present (skip old FIT files)
+        if any(pd.isna(row.get(f)) for f in feature_cols):
+            continue
+        X = np.array([[row[f] for f in feature_cols]])
+        pred = model.predict(X)[0]  # 1 = chip, 0 = putt
+        sdf.at[i, "class"] = "chip" if pred == 1 else "putt"
 
     return sdf
 
