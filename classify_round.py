@@ -59,6 +59,19 @@ def point_in_polygon(lat, lon, polygon):
     return inside
 
 
+def point_on_hole_green(lat, lon, hole_data):
+    """Check if a point is inside a hole's green — checks main polygon AND
+    alt polygon if one exists. Temp green positions (used when a green is
+    under maintenance) are stored as alt_green_polygon on the hole entry.
+    """
+    if point_in_polygon(lat, lon, hole_data["green_polygon"]):
+        return True
+    alt = hole_data.get("alt_green_polygon")
+    if alt and point_in_polygon(lat, lon, alt):
+        return True
+    return False
+
+
 def find_nearest_tee(lat, lon, holes):
     """Return (hole_number, distance_m) of the nearest tee to a point."""
     best_h, best_d = -1, 99999
@@ -77,18 +90,22 @@ def find_green(lat, lon, holes):
     radius around the green centroid to handle GPS drift. The fallback
     radius is sqrt(polygon_area / pi) + GPS_BUFFER.
     """
-    # Precise check
+    # Precise check — main polygon OR alt polygon (temp green position)
     for h in holes:
-        if point_in_polygon(lat, lon, h["green_polygon"]):
+        if point_on_hole_green(lat, lon, h):
             return h["hole"]
-    # Fallback: dynamic radius from centroid
+    # Fallback: dynamic radius from centroid. Check alt centroid too if present.
     for h in holes:
         c = h["green_centroid"]
-        poly_radius = math.sqrt(h["gps_polygon_area_m2"] / math.pi)
-        max_radius = poly_radius + GPS_BUFFER
-        d = haversine_m(lat, lon, c["lat"], c["lon"])
-        if d <= max_radius:
+        poly_radius = math.sqrt(h["gps_polygon_area_m2"] / math.pi) + GPS_BUFFER
+        if haversine_m(lat, lon, c["lat"], c["lon"]) <= poly_radius:
             return h["hole"]
+        alt_c = h.get("alt_green_centroid")
+        alt_area = h.get("alt_gps_polygon_area_m2")
+        if alt_c and alt_area:
+            alt_radius = math.sqrt(alt_area / math.pi) + GPS_BUFFER
+            if haversine_m(lat, lon, alt_c["lat"], alt_c["lon"]) <= alt_radius:
+                return h["hole"]
     return None
 
 
@@ -205,7 +222,7 @@ def classify_shots(sdf, holes_data, use_ml=True):
         # putt already on the new hole's green.
         strict_match_hole = None
         for hd in holes_data:
-            if point_in_polygon(lat, lon, hd["green_polygon"]):
+            if point_on_hole_green(lat, lon, hd):
                 strict_match_hole = hd["hole"]
                 break
 
@@ -237,7 +254,7 @@ def classify_shots(sdf, holes_data, use_ml=True):
         else:
             # Check if THIS shot is a putt strictly on the current hole's green
             strict_on = any(
-                point_in_polygon(lat, lon, hd["green_polygon"])
+                point_on_hole_green(lat, lon, hd)
                 for hd in holes_data
             )
             if strict_on:
@@ -281,7 +298,7 @@ def classify_shots(sdf, holes_data, use_ml=True):
             if sdf.at[idx, "peak_mag"] > PITCH_THRESHOLD:
                 continue
             lat, lon = sdf.at[idx, "lat"], sdf.at[idx, "lon"]
-            if any(point_in_polygon(lat, lon, hd["green_polygon"]) for hd in holes_data):
+            if any(point_on_hole_green(lat, lon, hd) for hd in holes_data):
                 first_putt_pos = pos
                 break
         # Fallback: no strict polygon match found, use generous
@@ -324,7 +341,7 @@ def classify_shots(sdf, holes_data, use_ml=True):
             # Check if GPS was strict (on polygon) or loose (centroid fallback)
             strict_on_green = False
             for hd in holes_data:
-                if point_in_polygon(row["lat"], row["lon"], hd["green_polygon"]):
+                if point_on_hole_green(row["lat"], row["lon"], hd):
                     strict_on_green = True
                     break
             if not strict_on_green:
@@ -377,7 +394,7 @@ def apply_ml_classifier(sdf, holes_data, artifact):
             haversine_m(lat, lon, h["green_centroid"]["lat"], h["green_centroid"]["lon"])
             for h in holes_data
         )
-        strict = any(point_in_polygon(lat, lon, h["green_polygon"]) for h in holes_data)
+        strict = any(point_on_hole_green(lat, lon, h) for h in holes_data)
         sdf.at[i, "on_green_strict"] = 1 if strict else 0
         buf = False
         for h in holes_data:
@@ -388,9 +405,14 @@ def apply_ml_classifier(sdf, holes_data, artifact):
                 break
         sdf.at[i, "on_green_buffer"] = 1 if buf else 0
 
-    # Predict for every chip/putt shot with full features
+    # Predict for every chip/putt shot with full features, EXCEPT when
+    # GPS is strictly inside a green polygon — in that case we trust GPS
+    # unambiguously (you're on the green, you're putting).
     for i, row in sdf.iterrows():
         if row.get("class") not in ("chip", "putt"):
+            continue
+        if row.get("on_green_strict") == 1:
+            sdf.at[i, "class"] = "putt"
             continue
         # Require all features present (skip old FIT files)
         if any(pd.isna(row.get(f)) for f in feature_cols):
