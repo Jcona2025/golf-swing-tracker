@@ -222,18 +222,29 @@ def classify_shots(sdf, holes_data):
             continue
         hole_indices = sdf[sdf["hole"] == h].index.tolist()
 
-        # Find the FIRST shot classified as on-green (generous check).
-        # This is the transition from approach to putting — everything from
-        # here onward is a putt even if later GPS drifts off (e.g., gentle
-        # tap-ins that lose GPS resolution).
+        # Find the FIRST shot that starts the putting phase.
+        # Prefer a STRICT polygon match (unambiguous on-green). Chips played
+        # near the green often fall inside the generous centroid+buffer but
+        # are outside the polygon — using strict avoids starting the putting
+        # phase at a chip. If no strict polygon match exists anywhere in
+        # the hole, fall back to the generous check.
         first_putt_pos = None
         for pos, idx in enumerate(hole_indices[1:], start=1):
             if sdf.at[idx, "peak_mag"] > PITCH_THRESHOLD:
                 continue
-            on_green = find_green(sdf.at[idx, "lat"], sdf.at[idx, "lon"], holes_data)
-            if on_green is not None:
+            lat, lon = sdf.at[idx, "lat"], sdf.at[idx, "lon"]
+            if any(point_in_polygon(lat, lon, hd["green_polygon"]) for hd in holes_data):
                 first_putt_pos = pos
                 break
+        # Fallback: no strict polygon match found, use generous
+        if first_putt_pos is None:
+            for pos, idx in enumerate(hole_indices[1:], start=1):
+                if sdf.at[idx, "peak_mag"] > PITCH_THRESHOLD:
+                    continue
+                on_green = find_green(sdf.at[idx, "lat"], sdf.at[idx, "lon"], holes_data)
+                if on_green is not None:
+                    first_putt_pos = pos
+                    break
 
         for pos, idx in enumerate(hole_indices):
             if pos == 0:
