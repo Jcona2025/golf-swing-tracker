@@ -90,6 +90,17 @@ ROUNDS = [
             ["pitch","putt","putt"],  # H18: missed hole-out
         ],
     },
+    {
+        "name": "R7", "fit": "Seapoint_round_temps.fit", "exclude": [],
+        "holes": [
+            ["pitch","chip","putt"], ["pitch","chip"], ["pitch","chip","putt","putt"],
+            ["pitch","putt","putt"], ["pitch","chip","putt"], ["pitch","chip","putt","putt"],
+            ["pitch","putt","putt"], ["pitch","putt","putt"], ["pitch","putt","putt"],
+            ["pitch","chip","putt"], ["pitch","chip","putt"], ["pitch","chip","putt","putt"],
+            ["pitch","chip","putt"], ["pitch","chip","putt","putt"], ["pitch","putt"],
+            ["pitch","chip","putt"], ["pitch","putt","putt"], ["pitch","putt","putt"],
+        ],
+    },
 ]
 
 
