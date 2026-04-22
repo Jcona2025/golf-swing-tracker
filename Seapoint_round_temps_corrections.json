@@ -1,0 +1,15 @@
+{
+  "_comment": "Round 7 (22 April 2026, Seapoint with temp H16-18). No missed presses. 10 chip/putt corrections.",
+  "reclassify": [
+    {"marker":  2, "class": "chip", "_note": "H1 shot 2"},
+    {"marker":  3, "class": "putt", "_note": "H1 shot 3"},
+    {"marker": 18, "class": "putt", "_note": "H6 shot 3"},
+    {"marker": 19, "class": "putt", "_note": "H6 shot 4"},
+    {"marker": 30, "class": "chip", "_note": "H10 shot 2"},
+    {"marker": 36, "class": "chip", "_note": "H12 shot 2"},
+    {"marker": 40, "class": "chip", "_note": "H13 shot 2"},
+    {"marker": 44, "class": "putt", "_note": "H14 shot 3"},
+    {"marker": 49, "class": "chip", "_note": "H16 shot 2"},
+    {"marker": 52, "class": "putt", "_note": "H17 shot 2"}
+  ]
+}
