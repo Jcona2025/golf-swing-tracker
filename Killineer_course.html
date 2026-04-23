@@ -8,16 +8,15 @@
       integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 <style>
   * { box-sizing: border-box; }
-  html, body { margin: 0; padding: 0; width: 100%; height: 100vh; overflow: hidden;
+  html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
   #header { background: #1d3557; color: white; padding: 10px 14px;
-    width: 100%; z-index: 1000;
-    flex: 0 0 auto;
+    position: absolute; top: 0; left: 0; right: 0; z-index: 1000;
+    height: 88px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
-  #header h1 { margin: 0 0 4px 0; font-size: 15px; font-weight: 600; line-height: 1.2; }
+  #header h1 { margin: 0 0 3px 0; font-size: 15px; font-weight: 600; line-height: 1.2; }
   #header .stats-row { font-size: 11px; opacity: 0.9; line-height: 1.5; }
-  #map { width: 100%; flex: 1 1 auto; min-height: 200px; }
-  body { display: flex; flex-direction: column; }
+  #map { position: absolute; top: 88px; left: 0; right: 0; bottom: 0; }
   .leaflet-div-icon-tee {
     background: #264653; color: white; border-radius: 50%;
     width: 26px !important; height: 26px !important;
