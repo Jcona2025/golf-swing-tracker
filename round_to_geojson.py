@@ -93,7 +93,7 @@ def build_geojson(round_df, shots_df, course):
             "hole": h["hole"],
             "distance_m": h["distance_official_m"],
             "index": h["index"],
-            "area_m2": h["area_official_m2"],
+            "area_m2": h.get("area_official_m2", h.get("gps_polygon_area_m2", 0)),
             "fill": "#7fc97f",
             "fill-opacity": 0.35,
             "stroke": "#2a9d8f",
@@ -175,7 +175,7 @@ def build_geojson(round_df, shots_df, course):
             # Shot 1 = pitch from the tee. Show hole info + pitch result.
             props["hole_distance_m"] = hole_data["distance_official_m"]
             props["hole_index"] = hole_data["index"]
-            props["green_area_m2"] = hole_data["area_official_m2"]
+            props["green_area_m2"] = hole_data.get("area_official_m2", hole_data.get("gps_polygon_area_m2", 0))
             stats = hole_stats.get(hole, {})
             if stats.get("pitch_on_green") is not None:
                 props["pitch_on_green"] = bool(stats["pitch_on_green"])
