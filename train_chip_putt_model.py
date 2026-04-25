@@ -101,6 +101,28 @@ ROUNDS = [
             ["pitch","chip","putt"], ["pitch","putt","putt"], ["pitch","putt","putt"],
         ],
     },
+    # R9: Killineer random holes (24 April 2026). 14 holes played; flat list
+    # in marker order matches the 14 detected holes in chronological order.
+    {
+        "name": "R9", "fit": "Killineer-randon-holes2.fit",
+        "course": "killineer.json", "exclude": [],
+        "holes": [
+            ["pitch","putt","putt"],         # H1
+            ["pitch","chip","putt"],         # H3
+            ["pitch","chip","putt"],         # H5
+            ["pitch","putt"],                # H6
+            ["pitch","chip","putt"],         # H7
+            ["pitch","chip","putt"],         # H9
+            ["pitch","putt"],                # H10
+            ["pitch","putt"],                # H12
+            ["pitch","putt"],                # H13
+            ["pitch","chip","putt"],         # H14
+            ["pitch","chip","putt"],         # H15
+            ["pitch","putt"],                # H16
+            ["pitch","chip","putt"],         # H17
+            ["pitch","chip","putt","putt"],  # H18
+        ],
+    },
 ]
 
 
@@ -132,10 +154,14 @@ def add_gps_features(sdf, course):
 
 def main():
     print("Loading course data...")
-    course = json.load(open("seapoint.json"))
+    courses = {
+        "seapoint.json": json.load(open("seapoint.json")),
+        "killineer.json": json.load(open("killineer.json")),
+    }
 
     all_rows = []
     for r in ROUNDS:
+        course = courses[r.get("course", "seapoint.json")]
         df = load_round(r["fit"])
         sdf = extract_shots(df)
         sdf = sdf[~sdf["marker"].isin(r["exclude"])].reset_index(drop=True)

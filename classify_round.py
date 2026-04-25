@@ -228,7 +228,25 @@ def classify_shots(sdf, holes_data, use_ml=True):
 
         if row["peak_mag"] > PITCH_THRESHOLD:
             new_hole = True
-            nearest_h, _ = find_nearest_tee(lat, lon, holes_data)
+            # Prefer the nearest UNPLAYED hole within 15m if the absolute
+            # nearest tee is one we've already played. This handles tight
+            # P&P courses where adjacent holes' tees are within a few metres
+            # — e.g. Killineer's H9 and H13 tees are 5m apart.
+            nearest_h, nearest_d = find_nearest_tee(lat, lon, holes_data)
+            played = set(h for h in hole_assignments if h > 0)
+            if nearest_h in played and nearest_d < 15:
+                # Look for a closer unplayed hole within 15m of the absolute nearest
+                best_unplayed = None
+                best_d = 99999
+                for hd in holes_data:
+                    if hd["hole"] in played:
+                        continue
+                    d = haversine_m(lat, lon, hd["tee"]["lat"], hd["tee"]["lon"])
+                    if d <= 15 and d < best_d:
+                        best_d = d
+                        best_unplayed = hd["hole"]
+                if best_unplayed is not None:
+                    nearest_h = best_unplayed
             new_hole_number = nearest_h
         elif strict_match_hole is not None and strict_match_hole != current_hole:
             new_hole = True

@@ -504,11 +504,11 @@
         "stroke": "#2a9d8f",
         "stroke-width": 2,
         "score": 3,
-        "n_putts": 1,
-        "n_chips": 1,
-        "pitch_on_green": false,
+        "n_putts": 2,
+        "n_chips": 0,
+        "pitch_on_green": true,
         "pitch_to_green_m": 1.7,
-        "up_and_down": true
+        "up_and_down": false
       }
     },
     {
@@ -9289,7 +9289,7 @@
         "hole_distance_m": 57,
         "hole_index": 7,
         "green_area_m2": 60.5,
-        "pitch_on_green": false,
+        "pitch_on_green": true,
         "pitch_result_m": 1.7,
         "title": "H7 tee &middot; pitch"
       }
@@ -9307,10 +9307,10 @@
         "kind": "shot",
         "hole": 7,
         "shot_num_in_hole": 2,
-        "shot_class": "chip",
+        "shot_class": "putt",
         "marker_global": 13,
         "peak_mag": 1395.0,
-        "marker-color": "#f4a261",
+        "marker-color": "#2a9d8f",
         "marker-symbol": "2",
         "marker-size": "medium",
         "peak_duration": 320.0,
@@ -9319,7 +9319,8 @@
         "pre_stillness": 1011.9,
         "dist_from_prev_m": 56.9,
         "dist_to_green_m": 1.7,
-        "title": "H7 shot 2 &middot; chip"
+        "putt_made": false,
+        "title": "H7 shot 2 &middot; putt"
       }
     },
     {
