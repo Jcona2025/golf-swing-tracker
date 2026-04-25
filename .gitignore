@@ -28,6 +28,15 @@ __pycache__/
 .venv/
 venv/
 
+# Generated outputs (rebuildable from FIT + course JSON)
+outputs/
+
+# Archive (kept for history, not part of active workflow)
+archive/
+
+# Windows download metadata
+*Zone.Identifier
+
 # OS
 .DS_Store
 Thumbs.db
