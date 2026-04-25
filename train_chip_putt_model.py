@@ -123,6 +123,28 @@ ROUNDS = [
             ["pitch","chip","putt","putt"],  # H18
         ],
     },
+    # R10: Killineer random holes 3 (25 April 2026). Played 1,3,5,6,7,9,10,12,
+    # 13,14,15,16,17,18. Marker 26 was an accidental press and is excluded.
+    {
+        "name": "R10", "fit": "Killineer-random-holes3.fit",
+        "course": "killineer.json", "exclude": [26],
+        "holes": [
+            ["pitch","putt","putt"],         # H1
+            ["pitch","chip","putt"],         # H3
+            ["pitch","chip"],                # H5
+            ["pitch","chip","putt"],         # H6
+            ["pitch","putt","putt"],         # H7
+            ["pitch","putt"],                # H9
+            ["pitch","putt","putt"],         # H10
+            ["pitch","chip","putt"],         # H12
+            ["pitch","putt","putt"],         # H13
+            ["pitch","chip","putt"],         # H14
+            ["pitch","chip","putt","putt"],  # H15
+            ["pitch","putt"],                # H16
+            ["pitch","putt","putt"],         # H17
+            ["pitch","chip","putt"],         # H18
+        ],
+    },
 ]
 
 
