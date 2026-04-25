@@ -1,0 +1,13 @@
+{
+  "_comment": "Round 9 (24 April 2026, Killineer random holes). H13 tee is physically next to H9 tee — classifier put M22+M23 on H9 (already played). Reassign to H13. Also 4 chips at the green-edge classified as putts.",
+  "reassign_hole": [
+    {"marker": 22, "hole": 13},
+    {"marker": 23, "hole": 13}
+  ],
+  "reclassify": [
+    {"marker":  5, "class": "chip", "_note": "H3 shot 2 — chip"},
+    {"marker": 13, "class": "chip", "_note": "H7 shot 2 — chip"},
+    {"marker": 16, "class": "chip", "_note": "H9 shot 2 — chip"},
+    {"marker": 28, "class": "chip", "_note": "H15 shot 2 — chip"}
+  ]
+}
