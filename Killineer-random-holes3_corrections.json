@@ -1,0 +1,24 @@
+{
+  "_comment": "Round 10 (25 April 2026, Killineer random holes 3). User played 1,3,5,6,7,9,10,12,13,14,15,16,17,18 in order. Two issues: (1) H5/H10 tees are adjacent — classifier swapped them. (2) M26 is an accidental press (peak_mag=1445, 61s before the real H14 pitch).",
+  "exclude_markers": [26],
+  "reassign_hole": [
+    {"marker": 7,  "hole": 5},
+    {"marker": 8,  "hole": 5},
+    {"marker": 17, "hole": 10},
+    {"marker": 18, "hole": 10},
+    {"marker": 19, "hole": 10},
+    {"marker": 20, "hole": 12},
+    {"marker": 23, "hole": 13}
+  ],
+  "reclassify": [
+    {"marker":  8, "class": "chip", "_note": "H5 chip"},
+    {"marker": 17, "class": "pitch", "_note": "H10 pitch (was misassigned to H9 as putt)"},
+    {"marker": 18, "class": "putt",  "_note": "H10 putt (was H5's first shot)"},
+    {"marker": 20, "class": "pitch", "_note": "H12 pitch (was H10's last shot)"},
+    {"marker": 21, "class": "chip",  "_note": "H12 chip (was H12 first/pitch under old grouping)"},
+    {"marker": 23, "class": "pitch", "_note": "H13 pitch (was H12's last shot/putt)"},
+    {"marker": 24, "class": "putt",  "_note": "H13 putt (was its pitch)"},
+    {"marker": 28, "class": "chip",  "_note": "H14 chip"},
+    {"marker": 40, "class": "chip",  "_note": "H18 chip"}
+  ]
+}
