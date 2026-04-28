@@ -1,0 +1,9 @@
+{
+  "_comment": "Round 11 (Macbride, first round at this course). 48 shots, 18 holes played in order. Four chip/putt swaps to fix; all hole assignments correct out of the box.",
+  "reclassify": [
+    {"marker": 18, "class": "chip", "_note": "H7 chip"},
+    {"marker": 26, "class": "chip", "_note": "H10 chip"},
+    {"marker": 39, "class": "putt", "_note": "H15 putt"},
+    {"marker": 41, "class": "chip", "_note": "H16 chip"}
+  ]
+}

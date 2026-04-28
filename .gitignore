@@ -30,6 +30,8 @@ venv/
 
 # Generated outputs (rebuildable from FIT + course JSON)
 outputs/
+*_classified.csv
+*_mapper.html
 
 # Archive (kept for history, not part of active workflow)
 archive/
