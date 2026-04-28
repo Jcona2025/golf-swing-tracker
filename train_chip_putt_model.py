@@ -145,6 +145,33 @@ ROUNDS = [
             ["pitch","chip","putt"],         # H18
         ],
     },
+    # R11: Macbride (first round at this course, 27 April 2026). 18 holes
+    # played in order. Course mapped from this round's GPS trail; distances
+    # are placeholders pending official scorecard.
+    {
+        "name": "R11", "fit": "Macbride_full.fit",
+        "course": "macbride.json", "exclude": [],
+        "holes": [
+            ["pitch","putt","putt"],   # H1
+            ["pitch","putt","putt"],   # H2
+            ["pitch","chip"],          # H3
+            ["pitch","putt"],          # H4
+            ["pitch","putt","putt"],   # H5
+            ["pitch","putt","putt"],   # H6
+            ["pitch","chip","putt"],   # H7
+            ["pitch","putt","putt"],   # H8
+            ["pitch","chip"],          # H9
+            ["pitch","chip"],          # H10
+            ["pitch","putt","putt"],   # H11
+            ["pitch","putt","putt"],   # H12
+            ["pitch","putt"],          # H13
+            ["pitch","putt"],          # H14
+            ["pitch","putt","putt"],   # H15
+            ["pitch","chip","putt"],   # H16
+            ["pitch","putt","putt"],   # H17
+            ["pitch","putt","putt"],   # H18
+        ],
+    },
 ]
 
 
@@ -179,6 +206,7 @@ def main():
     courses = {
         "seapoint.json": json.load(open("seapoint.json")),
         "killineer.json": json.load(open("killineer.json")),
+        "macbride.json": json.load(open("macbride.json")),
     }
 
     all_rows = []
