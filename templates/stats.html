@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+{% from '_partials.html' import page_head, nav_bar %}
+<head>{{ page_head('Stats') }}</head>
+<body>
+{{ nav_bar('stats') }}
+<div class="container">
+  <h1>Stats</h1>
+
+  {% if overall.headlines.n_rounds == 0 %}
+    <div class="card"><div class="empty">No rounds yet. <a href="/" style="color:#2a9d8f">Upload one</a> to start seeing stats.</div></div>
+  {% else %}
+
+  <div class="card">
+    <div class="stat-grid">
+      <div class="stat">
+        <div class="label">Rounds</div>
+        <div class="value">{{ overall.headlines.n_rounds }}</div>
+      </div>
+      <div class="stat">
+        <div class="label">Best score</div>
+        <div class="value">{{ overall.headlines.best_score }}</div>
+      </div>
+      <div class="stat">
+        <div class="label">Avg score</div>
+        <div class="value">{{ overall.headlines.avg_score }}</div>
+      </div>
+      <div class="stat">
+        <div class="label">Avg putts/hole</div>
+        <div class="value">{{ overall.headlines.avg_putts_per_hole }}</div>
+      </div>
+      <div class="stat">
+        <div class="label">Avg GIR</div>
+        <div class="value">{% if overall.headlines.avg_gir_pct is not none %}{{ overall.headlines.avg_gir_pct }}%{% else %}—{% endif %}</div>
+      </div>
+      <div class="stat">
+        <div class="label">Up &amp; downs</div>
+        <div class="value">{{ overall.headlines.total_up_and_downs }}</div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Trends</h2>
+  <div class="card">
+    <div class="chart-wrap"><canvas id="trend"></canvas></div>
+  </div>
+
+  <h2>Per course</h2>
+  {% for c in per_course %}
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px">
+      <h2 style="margin:0">{{ c.course }}</h2>
+      <div style="font-size:13px;color:#6c8aa3">
+        {{ c.n_rounds }} round{{ 's' if c.n_rounds != 1 else '' }} ·
+        avg {{ c.avg_score }} · best {{ c.best_score }} · worst {{ c.worst_score }}
+      </div>
+    </div>
+    <table>
+      <thead>
+        <tr><th>H</th><th>Played</th><th>Avg</th><th>Best</th><th>Worst</th><th>Putts</th><th>GIR</th></tr>
+      </thead>
+      <tbody>
+        {% for h in c.per_hole %}
+        <tr>
+          <td><b>{{ h.hole }}</b></td>
+          <td>{{ h.n_played }}</td>
+          <td>{{ h.avg_score }}</td>
+          <td>{{ h.best_score }}</td>
+          <td>{{ h.worst_score }}</td>
+          <td>{{ h.avg_putts }}</td>
+          <td>{% if h.gir_pct is not none %}{{ '%.0f'|format(h.gir_pct) }}%{% else %}—{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endfor %}
+
+  {% endif %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+  const TIMELINE = {{ overall.timeline|tojson }};
+  if (TIMELINE.length) {
+    const labels = TIMELINE.map(t => t.date ? t.date.slice(0,10) : '?');
+    const scores = TIMELINE.map(t => t.score);
+    const putts = TIMELINE.map(t => t.putts_per_hole);
+    const girs = TIMELINE.map(t => t.gir_pct);
+
+    new Chart(document.getElementById('trend'), {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          { label: 'Score',         data: scores, borderColor: '#e63946', backgroundColor: '#e6394620', yAxisID: 'y',  tension: 0.25, pointRadius: 4 },
+          { label: 'Putts/hole',    data: putts,  borderColor: '#2a9d8f', backgroundColor: '#2a9d8f20', yAxisID: 'y1', tension: 0.25, pointRadius: 4 },
+          { label: 'GIR %',         data: girs,   borderColor: '#f4a261', backgroundColor: '#f4a26120', yAxisID: 'y2', tension: 0.25, pointRadius: 4 },
+        ],
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: { legend: { position: 'bottom' } },
+        scales: {
+          y:  { position: 'left',  title: { display: true, text: 'Score' } },
+          y1: { position: 'right', grid: { drawOnChartArea: false }, title: { display: true, text: 'Putts/hole' } },
+          y2: { position: 'right', grid: { drawOnChartArea: false }, min: 0, max: 100, display: false },
+        },
+      },
+    });
+  }
+</script>
+</body>
+</html>

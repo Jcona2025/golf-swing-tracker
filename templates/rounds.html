@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+{% from '_partials.html' import page_head, nav_bar %}
+<head>{{ page_head('Rounds') }}</head>
+<body>
+{{ nav_bar('rounds') }}
+<div class="container">
+  <h1>Rounds</h1>
+  <div class="card">
+    {% if rounds %}
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Course</th>
+            <th>Holes</th>
+            <th>Score</th>
+            <th>Putts/H</th>
+            <th>GIR</th>
+            <th>Chips</th>
+            <th>U&amp;D</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in rounds %}
+          <tr>
+            <td>{{ r.date[:10] if r.date else '—' }}</td>
+            <td>{{ r.course or '—' }}</td>
+            <td>{{ r.n_holes }}</td>
+            <td><b>{{ r.score }}</b></td>
+            <td>{{ '%.2f'|format(r.putts_per_hole) }}</td>
+            <td>{% if r.gir_pct is not none %}{{ r.greens_hit }}/{{ r.greens_played }} ({{ '%.0f'|format(r.gir_pct) }}%){% else %}—{% endif %}</td>
+            <td>{{ r.n_chips }}</td>
+            <td>{{ r.up_and_downs }}</td>
+            <td><a href="/view/{{ r.run_id }}">view →</a></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <div class="empty">
+        No rounds uploaded yet. <a href="/" style="color:#2a9d8f">Upload one</a> to see it here.
+      </div>
+    {% endif %}
+  </div>
+</div>
+</body>
+</html>

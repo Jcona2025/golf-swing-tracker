@@ -14,10 +14,27 @@ from pathlib import Path
 from flask import (Flask, render_template, request, redirect, url_for,
                    abort, send_file, jsonify, Response)
 
+import stats as stats_engine
+
 
 PROJECT_ROOT = Path(__file__).resolve().parent
 RUNS_DIR = PROJECT_ROOT / "web_runs"
 RUNS_DIR.mkdir(exist_ok=True)
+
+
+def extract_round_date(fit_path: Path) -> str | None:
+    """Extract the round start time from a FIT file as ISO string. Returns
+    None if unreadable. Imported lazily so stats.py stays import-light."""
+    try:
+        import fitparse
+        fit = fitparse.FitFile(str(fit_path))
+        for rec in fit.get_messages("record"):
+            for f in rec.fields:
+                if f.name == "timestamp" and f.value:
+                    return f.value.isoformat()
+        return None
+    except Exception:
+        return None
 
 
 def discover_courses():
@@ -170,10 +187,12 @@ def upload():
     run_id = uuid.uuid4().hex[:10]
     run_dir = RUNS_DIR / run_id
     run_dir.mkdir(parents=True)
-    fit.save(str(run_dir / "round.fit"))
+    fit_path = run_dir / "round.fit"
+    fit.save(str(fit_path))
     (run_dir / "meta.json").write_text(json.dumps({
         "course": course_file,
         "original_fit": fit.filename,
+        "date": extract_round_date(fit_path),
     }))
 
     ok, err = regenerate_overlay(run_dir)
@@ -199,6 +218,32 @@ def view(run_id):
     else:
         html += panel
     return Response(html, mimetype="text/html")
+
+
+@app.route("/rounds")
+def rounds_page():
+    rounds = stats_engine.list_rounds(RUNS_DIR)
+    return render_template("rounds.html", rounds=rounds)
+
+
+@app.route("/stats")
+def stats_page():
+    rounds = stats_engine.list_rounds(RUNS_DIR)
+    overall = stats_engine.overall_stats(rounds)
+    per_course = stats_engine.per_course_stats(rounds)
+    return render_template("stats.html", overall=overall, per_course=per_course)
+
+
+@app.route("/api/stats")
+def stats_api():
+    """JSON stats — designed so the future Android app can hit this endpoint
+    rather than reimplementing the aggregation."""
+    rounds = stats_engine.list_rounds(RUNS_DIR)
+    return jsonify({
+        "rounds": rounds,
+        "overall": stats_engine.overall_stats(rounds),
+        "per_course": stats_engine.per_course_stats(rounds),
+    })
 
 
 @app.route("/reclassify/<run_id>", methods=["POST"])
