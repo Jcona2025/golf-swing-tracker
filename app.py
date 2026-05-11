@@ -141,6 +141,15 @@ app = Flask(__name__, template_folder=str(PROJECT_ROOT / "templates"))
 app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024
 
 
+@app.after_request
+def add_security_headers(resp):
+    # nginx adds HSTS at the edge; these are app-level defence-in-depth.
+    resp.headers.setdefault("X-Content-Type-Options", "nosniff")
+    resp.headers.setdefault("X-Frame-Options", "DENY")
+    resp.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+    return resp
+
+
 @app.route("/")
 def index():
     return render_template("upload.html", courses=discover_courses())
@@ -152,7 +161,10 @@ def upload():
     course_file = request.form.get("course")
     if not fit or not fit.filename.lower().endswith(".fit"):
         return "Please upload a .fit file.", 400
-    if not course_file or not (PROJECT_ROOT / course_file).exists():
+    # Whitelist: course must be one of the files discover_courses() returns.
+    # Prevents path traversal (../../etc/passwd) and absolute-path probes.
+    allowed = {c["file"] for c in discover_courses()}
+    if course_file not in allowed:
         return "Please pick a valid course.", 400
 
     run_id = uuid.uuid4().hex[:10]
@@ -166,8 +178,10 @@ def upload():
 
     ok, err = regenerate_overlay(run_dir)
     if not ok:
+        # Persist details server-side; return generic message to the client
+        # so stack traces / filesystem paths don't leak.
         (run_dir / "error.log").write_text(err)
-        return f"Processing failed.<br><pre>{err[-2000:]}</pre>", 500
+        return f"Processing failed. Reference: {run_id}", 500
 
     return redirect(url_for("view", run_id=run_id))
 

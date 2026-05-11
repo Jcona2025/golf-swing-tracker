@@ -25,8 +25,9 @@ python -c "import app; print('ok')"
 ## 3. systemd service
 
 ```bash
-# Replace __USER__ in the service file with your VPS username
-sed "s/__USER__/$USER/g" deploy/swinglogger.service | sudo tee /etc/systemd/system/swinglogger.service
+# Replace __USER__ and __HOME__ in the service file (root home is /root, not /home/root)
+sed -e "s/__USER__/$USER/g" -e "s|__HOME__|$HOME|g" deploy/swinglogger.service \
+    | sudo tee /etc/systemd/system/swinglogger.service
 sudo systemctl daemon-reload
 sudo systemctl enable --now swinglogger
 sudo systemctl status swinglogger    # should be 'active (running)'

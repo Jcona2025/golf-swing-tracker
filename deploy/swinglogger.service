@@ -7,14 +7,14 @@ Type=simple
 # EDIT THESE TO MATCH YOUR VPS:
 User=__USER__
 Group=__USER__
-WorkingDirectory=/home/__USER__/swinglogger
-Environment="PATH=/home/__USER__/swinglogger/.venv/bin"
-ExecStart=/home/__USER__/swinglogger/.venv/bin/gunicorn \
+WorkingDirectory=__HOME__/swinglogger
+Environment="PATH=__HOME__/swinglogger/.venv/bin"
+ExecStart=__HOME__/swinglogger/.venv/bin/gunicorn \
     --workers 2 \
     --bind 127.0.0.1:8001 \
     --timeout 60 \
-    --access-logfile /home/__USER__/swinglogger/access.log \
-    --error-logfile /home/__USER__/swinglogger/error.log \
+    --access-logfile __HOME__/swinglogger/access.log \
+    --error-logfile __HOME__/swinglogger/error.log \
     app:app
 
 Restart=on-failure
