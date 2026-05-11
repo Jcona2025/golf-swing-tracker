@@ -14,6 +14,18 @@ from collections import defaultdict
 from statistics import mean
 
 
+def _is_broken(summary: dict) -> bool:
+    """Heuristic: a round whose pipeline output looks structurally suspect.
+    Most often this means hole-routing collapsed everything into one or two
+    holes (the user uploaded a random-holes round without its corrections).
+    """
+    if summary["n_holes"] < 5:
+        return True
+    if summary["putts_per_hole"] > 5:
+        return True
+    return False
+
+
 def _round_summary(run_dir: Path) -> dict | None:
     """Compute one round's summary from its overlay.geojson + meta.json."""
     overlay_path = run_dir / "overlay.geojson"
@@ -36,7 +48,7 @@ def _round_summary(run_dir: Path) -> dict | None:
     greens_played = sum(1 for h in holes if h.get("pitch_on_green") is not None)
     up_and_downs = sum(1 for h in holes if h.get("up_and_down") is True)
 
-    return {
+    summary = {
         "run_id": run_dir.name,
         "course": meta.get("course", "").replace(".json", ""),
         "course_display": (overlay.get("name") or "").replace(" round overlay", ""),
@@ -63,6 +75,8 @@ def _round_summary(run_dir: Path) -> dict | None:
             for h in sorted(holes, key=lambda x: int(x["hole"]))
         ],
     }
+    summary["broken"] = _is_broken(summary)
+    return summary
 
 
 def list_rounds(runs_dir: Path) -> list[dict]:
@@ -80,7 +94,11 @@ def list_rounds(runs_dir: Path) -> list[dict]:
 
 
 def overall_stats(rounds: list[dict]) -> dict:
-    """Headline metrics + timeline series across all rounds (chronological)."""
+    """Headline metrics + timeline series across all rounds (chronological).
+    Broken rounds (hole-routing collapse) are excluded from aggregates so
+    they don't poison the averages, but they still appear in the rounds
+    list flagged so the user can see them."""
+    rounds = [r for r in rounds if not r.get("broken")]
     if not rounds:
         return {"n_rounds": 0, "timeline": [], "headlines": {}}
 
@@ -115,7 +133,8 @@ def overall_stats(rounds: list[dict]) -> dict:
 
 def callouts(rounds: list[dict]) -> list[dict]:
     """Auto-generated friendly insights for the dashboard.
-    Each callout: {kind, headline, detail}."""
+    Each callout: {kind, headline, detail}. Broken rounds excluded."""
+    rounds = [r for r in rounds if not r.get("broken")]
     if not rounds:
         return []
 
@@ -164,7 +183,9 @@ def callouts(rounds: list[dict]) -> list[dict]:
 
 
 def per_course_stats(rounds: list[dict]) -> list[dict]:
-    """For each course: round count, best/avg/worst score, per-hole avg score."""
+    """For each course: round count, best/avg/worst score, per-hole avg score.
+    Broken rounds excluded so per-hole averages aren't skewed."""
+    rounds = [r for r in rounds if not r.get("broken")]
     by_course = defaultdict(list)
     for r in rounds:
         by_course[r["course"]].append(r)

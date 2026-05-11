@@ -195,6 +195,19 @@ def upload():
         "date": extract_round_date(fit_path),
     }))
 
+    # Optional corrections file — needed for "random holes" rounds and other
+    # cases where the raw classifier output needs manual reassignment/reclassify.
+    corrections_upload = request.files.get("corrections")
+    if corrections_upload and corrections_upload.filename:
+        try:
+            raw = corrections_upload.read()
+            parsed = json.loads(raw)  # validate JSON before saving
+            if not isinstance(parsed, dict):
+                raise ValueError("corrections must be a JSON object")
+            (run_dir / "corrections.json").write_bytes(raw)
+        except (json.JSONDecodeError, ValueError, UnicodeDecodeError):
+            return "Corrections file is not valid JSON.", 400
+
     ok, err = regenerate_overlay(run_dir)
     if not ok:
         # Persist details server-side; return generic message to the client

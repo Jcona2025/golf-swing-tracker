@@ -6,6 +6,17 @@
 {{ nav_bar('rounds') }}
 <div class="container">
   <h1>Rounds</h1>
+  {% set broken_count = rounds | selectattr('broken') | list | length %}
+  {% if broken_count > 0 %}
+  <div class="card" style="background:#fff7ed;border-left:4px solid #e76f51;">
+    <div style="font-weight:600;color:#1d3557;font-size:14px;">
+      {{ broken_count }} round{{ 's' if broken_count != 1 else '' }} flagged as needing corrections
+    </div>
+    <div style="font-size:12px;color:#6c8aa3;margin-top:4px;line-height:1.5;">
+      Hole-routing collapsed (often happens with random-holes rounds uploaded without a corrections file). These rounds are kept in the list but excluded from your averages, heatmap, and trends so they don't skew the numbers. Re-upload with the matching <code>_corrections.json</code> to fix.
+    </div>
+  </div>
+  {% endif %}
   <div class="card">
     {% if rounds %}
       <table>
@@ -24,8 +35,13 @@
         </thead>
         <tbody>
           {% for r in rounds %}
-          <tr>
-            <td>{{ r.date[:10] if r.date else '—' }}</td>
+          <tr {% if r.broken %}style="opacity:0.55;"{% endif %}>
+            <td>
+              {{ r.date[:10] if r.date else '—' }}
+              {% if r.broken %}
+              <span style="background:#e76f51;color:white;font-size:9px;padding:1px 5px;border-radius:3px;margin-left:4px;text-transform:uppercase;letter-spacing:0.5px;" title="Hole-routing collapsed — excluded from averages">!</span>
+              {% endif %}
+            </td>
             <td>{{ r.course or '—' }}</td>
             <td>{{ r.n_holes }}</td>
             <td><b>{{ r.score }}</b></td>

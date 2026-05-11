@@ -70,6 +70,18 @@
         <input type="file" name="fit" id="fit" accept=".fit" required style="display:none">
       </div>
 
+      <details style="margin-top: 14px;">
+        <summary style="cursor:pointer; color:#457b9d; font-size:13px; font-weight:600; padding:4px 0;">
+          Have a corrections file? (optional)
+        </summary>
+        <div class="drop" id="drop-corr" style="margin-top: 8px; padding: 18px 14px;">
+          <strong style="font-size:13px;">Drop your corrections .json here</strong>
+          <div class="sub" style="font-size:11px;">Needed for random-holes rounds or any round with manual fixes.</div>
+          <div class="file-name" id="corr-name"></div>
+          <input type="file" name="corrections" id="corrections" accept=".json,application/json" style="display:none">
+        </div>
+      </details>
+
       <button type="submit" id="submit">Analyze round</button>
       <div id="spinner">Processing… this takes a few seconds.</div>
     </form>
@@ -101,6 +113,25 @@
   });
   fitInput.addEventListener('change', () => {
     if (fitInput.files.length) fileName.textContent = fitInput.files[0].name;
+  });
+
+  // Same drag/drop wiring for the optional corrections field
+  const dropCorr = document.getElementById('drop-corr');
+  const corrInput = document.getElementById('corrections');
+  const corrName = document.getElementById('corr-name');
+  dropCorr.addEventListener('click', () => corrInput.click());
+  ['dragenter','dragover'].forEach(ev =>
+    dropCorr.addEventListener(ev, e => { e.preventDefault(); dropCorr.classList.add('dragover'); }));
+  ['dragleave','drop'].forEach(ev =>
+    dropCorr.addEventListener(ev, e => { e.preventDefault(); dropCorr.classList.remove('dragover'); }));
+  dropCorr.addEventListener('drop', e => {
+    if (e.dataTransfer.files.length) {
+      corrInput.files = e.dataTransfer.files;
+      corrName.textContent = corrInput.files[0].name;
+    }
+  });
+  corrInput.addEventListener('change', () => {
+    if (corrInput.files.length) corrName.textContent = corrInput.files[0].name;
   });
 
   form.addEventListener('submit', () => {
