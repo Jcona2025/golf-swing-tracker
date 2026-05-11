@@ -33,6 +33,9 @@ outputs/
 *_classified.csv
 *_mapper.html
 
+# Web app processed uploads (rebuildable from FIT + course)
+web_runs/
+
 # Archive (kept for history, not part of active workflow)
 archive/
 
