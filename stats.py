@@ -113,6 +113,56 @@ def overall_stats(rounds: list[dict]) -> dict:
     return {"timeline": timeline, "headlines": headlines}
 
 
+def callouts(rounds: list[dict]) -> list[dict]:
+    """Auto-generated friendly insights for the dashboard.
+    Each callout: {kind, headline, detail}."""
+    if not rounds:
+        return []
+
+    out = []
+
+    # Best round
+    best = min(rounds, key=lambda r: (r["score"], -r["n_holes"]))
+    out.append({
+        "kind": "best_round",
+        "headline": f"Best round: {best['score']}",
+        "detail": f"on {best['course']} ({best['date'][:10] if best['date'] else '—'})",
+    })
+
+    # Strongest / toughest hole (across all courses, hole+course pair)
+    pair_scores = defaultdict(list)
+    for r in rounds:
+        for h in r["per_hole"]:
+            pair_scores[(r["course"], h["hole"])].append(h["score"])
+    avgs = [
+        {"course": c, "hole": h, "avg": mean(scs), "n": len(scs)}
+        for (c, h), scs in pair_scores.items() if len(scs) >= 2
+    ]
+    if avgs:
+        strongest = min(avgs, key=lambda x: x["avg"])
+        toughest = max(avgs, key=lambda x: x["avg"])
+        out.append({
+            "kind": "strongest_hole",
+            "headline": f"Strongest hole: {strongest['course'].title()} H{strongest['hole']}",
+            "detail": f"avg {strongest['avg']:.1f} over {strongest['n']} plays",
+        })
+        out.append({
+            "kind": "toughest_hole",
+            "headline": f"Toughest hole: {toughest['course'].title()} H{toughest['hole']}",
+            "detail": f"avg {toughest['avg']:.1f} over {toughest['n']} plays",
+        })
+
+    # Best putting round
+    best_putt = min(rounds, key=lambda r: r["putts_per_hole"])
+    out.append({
+        "kind": "best_putting",
+        "headline": f"Best putting: {best_putt['putts_per_hole']:.2f}/hole",
+        "detail": f"on {best_putt['course']} ({best_putt['date'][:10] if best_putt['date'] else '—'})",
+    })
+
+    return out
+
+
 def per_course_stats(rounds: list[dict]) -> list[dict]:
     """For each course: round count, best/avg/worst score, per-hole avg score."""
     by_course = defaultdict(list)

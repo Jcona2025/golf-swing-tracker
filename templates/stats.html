@@ -1,78 +1,169 @@
 <!DOCTYPE html>
 <html lang="en">
-{% from '_partials.html' import page_head, nav_bar %}
-<head>{{ page_head('Stats') }}</head>
+{% from '_partials.html' import nav_bar %}
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stats — SwingLogger</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f1faee; color: #1d3557; min-height: 100vh; }
+  nav { background: #1d3557; color: white; padding: 10px 16px; display: flex; gap: 16px; align-items: center; }
+  nav .brand { font-weight: 700; font-size: 15px; }
+  nav a { color: white; text-decoration: none; font-size: 14px; opacity: 0.85; }
+  nav a:hover, nav a.active { opacity: 1; text-decoration: underline; }
+  .container { max-width: 720px; margin: 0 auto; padding: 18px; }
+
+  /* HERO */
+  .hero { background: linear-gradient(135deg, #1d3557 0%, #2a4a73 100%); color: white;
+    border-radius: 14px; padding: 26px 22px; text-align: center; box-shadow: 0 4px 16px rgba(29,53,87,0.18); margin-bottom: 16px; }
+  .hero .label { font-size: 13px; opacity: 0.75; text-transform: uppercase; letter-spacing: 1px; }
+  .hero .big { font-size: 56px; font-weight: 800; line-height: 1; margin: 6px 0 4px; }
+  .hero .sub { font-size: 13px; opacity: 0.85; }
+  .hero-mini { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 18px; }
+  .hero-mini .item { background: rgba(255,255,255,0.10); border-radius: 8px; padding: 8px 6px; }
+  .hero-mini .item .v { font-size: 18px; font-weight: 700; }
+  .hero-mini .item .l { font-size: 10px; opacity: 0.75; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* CALLOUTS */
+  .callouts { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin-bottom: 16px; }
+  .callout { background: white; border-radius: 10px; padding: 12px 14px; box-shadow: 0 2px 8px rgba(29,53,87,0.06); border-left: 4px solid #2a9d8f; }
+  .callout.toughest_hole { border-left-color: #e76f51; }
+  .callout.strongest_hole { border-left-color: #2a9d8f; }
+  .callout.best_round { border-left-color: #f4a261; }
+  .callout.best_putting { border-left-color: #457b9d; }
+  .callout .h { font-size: 14px; font-weight: 700; color: #1d3557; }
+  .callout .d { font-size: 12px; color: #6c8aa3; margin-top: 2px; }
+
+  /* SECTION */
+  h2 { font-size: 16px; color: #1d3557; margin: 22px 0 10px; font-weight: 700; }
+  .card { background: white; border-radius: 10px; padding: 16px; box-shadow: 0 2px 8px rgba(29,53,87,0.06); margin-bottom: 14px; }
+  .chart-wrap { position: relative; height: 220px; }
+
+  /* PER-COURSE CARDS */
+  .course-card { background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(29,53,87,0.06); margin-bottom: 14px; overflow: hidden; }
+  .course-card .head { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; border-bottom: 1px solid #eef0f3; }
+  .course-card .head .name { font-size: 16px; font-weight: 700; color: #1d3557; text-transform: capitalize; }
+  .course-card .head .meta { font-size: 12px; color: #6c8aa3; }
+
+  /* HEATMAP */
+  .heatmap { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; padding: 14px 16px; }
+  .hcell { aspect-ratio: 1.1 / 1; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; font-size: 11px; line-height: 1.1; }
+  .hcell .h { opacity: 0.85; font-size: 10px; margin-bottom: 2px; }
+  .hcell .v { font-size: 16px; font-weight: 700; }
+  .hcell.miss { background: #e8edf1; color: #b0bbc8; }
+  .legend { display: flex; gap: 12px; padding: 4px 16px 14px; font-size: 11px; color: #6c8aa3; align-items: center; flex-wrap: wrap; }
+  .legend .sw { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 4px; vertical-align: middle; }
+
+  /* EXPAND */
+  .details { padding: 0 16px 14px; }
+  .details summary { cursor: pointer; padding: 8px 0; color: #2a9d8f; font-size: 12px; font-weight: 600; user-select: none; }
+  .details summary:hover { text-decoration: underline; }
+  .details table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 6px; }
+  .details th, .details td { padding: 5px 8px; text-align: left; border-bottom: 1px solid #f0f2f5; }
+  .details th { color: #6c8aa3; font-weight: 600; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* EMPTY */
+  .empty { text-align: center; padding: 40px 20px; color: #6c8aa3; }
+  .empty a { color: #2a9d8f; font-weight: 600; }
+
+  @media (max-width: 600px) {
+    .hero { padding: 22px 18px; }
+    .hero .big { font-size: 44px; }
+    .heatmap { gap: 4px; padding: 10px; }
+    .hcell .v { font-size: 14px; }
+  }
+</style>
+</head>
 <body>
 {{ nav_bar('stats') }}
 <div class="container">
-  <h1>Stats</h1>
 
   {% if overall.headlines.n_rounds == 0 %}
-    <div class="card"><div class="empty">No rounds yet. <a href="/" style="color:#2a9d8f">Upload one</a> to start seeing stats.</div></div>
+    <div class="card empty">
+      No rounds yet. <a href="/">Upload one</a> to start seeing your stats.
+    </div>
   {% else %}
 
-  <div class="card">
-    <div class="stat-grid">
-      <div class="stat">
-        <div class="label">Rounds</div>
-        <div class="value">{{ overall.headlines.n_rounds }}</div>
+  <!-- HERO -->
+  <div class="hero">
+    <div class="label">Your average score</div>
+    <div class="big">{{ overall.headlines.avg_score }}</div>
+    <div class="sub">across {{ overall.headlines.n_rounds }} round{{ 's' if overall.headlines.n_rounds != 1 else '' }} · {{ per_course|length }} course{{ 's' if per_course|length != 1 else '' }}</div>
+    <div class="hero-mini">
+      <div class="item">
+        <div class="v">{{ overall.headlines.best_score }}</div>
+        <div class="l">Best</div>
       </div>
-      <div class="stat">
-        <div class="label">Best score</div>
-        <div class="value">{{ overall.headlines.best_score }}</div>
+      <div class="item">
+        <div class="v">{{ overall.headlines.avg_putts_per_hole }}</div>
+        <div class="l">Putts/hole</div>
       </div>
-      <div class="stat">
-        <div class="label">Avg score</div>
-        <div class="value">{{ overall.headlines.avg_score }}</div>
-      </div>
-      <div class="stat">
-        <div class="label">Avg putts/hole</div>
-        <div class="value">{{ overall.headlines.avg_putts_per_hole }}</div>
-      </div>
-      <div class="stat">
-        <div class="label">Avg GIR</div>
-        <div class="value">{% if overall.headlines.avg_gir_pct is not none %}{{ overall.headlines.avg_gir_pct }}%{% else %}—{% endif %}</div>
-      </div>
-      <div class="stat">
-        <div class="label">Up &amp; downs</div>
-        <div class="value">{{ overall.headlines.total_up_and_downs }}</div>
+      <div class="item">
+        <div class="v">{% if overall.headlines.avg_gir_pct is not none %}{{ overall.headlines.avg_gir_pct|round|int }}%{% else %}—{% endif %}</div>
+        <div class="l">Greens</div>
       </div>
     </div>
   </div>
 
-  <h2>Trends</h2>
+  <!-- CALLOUTS -->
+  {% if insights %}
+  <div class="callouts">
+    {% for c in insights %}
+    <div class="callout {{ c.kind }}">
+      <div class="h">{{ c.headline }}</div>
+      <div class="d">{{ c.detail }}</div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- TREND -->
+  {% if overall.timeline|length > 1 %}
+  <h2>Score over time</h2>
   <div class="card">
     <div class="chart-wrap"><canvas id="trend"></canvas></div>
   </div>
+  {% endif %}
 
-  <h2>Per course</h2>
+  <!-- PER-COURSE -->
+  <h2>By course</h2>
   {% for c in per_course %}
-  <div class="card">
-    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px">
-      <h2 style="margin:0">{{ c.course }}</h2>
-      <div style="font-size:13px;color:#6c8aa3">
-        {{ c.n_rounds }} round{{ 's' if c.n_rounds != 1 else '' }} ·
-        avg {{ c.avg_score }} · best {{ c.best_score }} · worst {{ c.worst_score }}
-      </div>
+  <div class="course-card">
+    <div class="head">
+      <div class="name">{{ c.course }}</div>
+      <div class="meta">{{ c.n_rounds }} round{{ 's' if c.n_rounds != 1 else '' }} · avg {{ c.avg_score }} · best {{ c.best_score }}</div>
     </div>
-    <table>
-      <thead>
-        <tr><th>H</th><th>Played</th><th>Avg</th><th>Best</th><th>Worst</th><th>Putts</th><th>GIR</th></tr>
-      </thead>
-      <tbody>
-        {% for h in c.per_hole %}
-        <tr>
-          <td><b>{{ h.hole }}</b></td>
-          <td>{{ h.n_played }}</td>
-          <td>{{ h.avg_score }}</td>
-          <td>{{ h.best_score }}</td>
-          <td>{{ h.worst_score }}</td>
-          <td>{{ h.avg_putts }}</td>
-          <td>{% if h.gir_pct is not none %}{{ '%.0f'|format(h.gir_pct) }}%{% else %}—{% endif %}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    <div class="heatmap" id="heat-{{ loop.index }}">
+      {# Heat cells filled in by JS using the per_hole data #}
+    </div>
+    <div class="legend">
+      <span><span class="sw" style="background:#2a9d8f"></span>Avg ≤ par</span>
+      <span><span class="sw" style="background:#f4a261"></span>Par+0.5</span>
+      <span><span class="sw" style="background:#e76f51"></span>Par+1+</span>
+      <span style="margin-left:auto">(par 3 holes)</span>
+    </div>
+    <details class="details">
+      <summary>Show per-hole numbers</summary>
+      <table>
+        <thead><tr><th>H</th><th>Played</th><th>Avg</th><th>Best</th><th>Worst</th><th>Putts</th><th>GIR</th></tr></thead>
+        <tbody>
+          {% for h in c.per_hole %}
+          <tr>
+            <td><b>{{ h.hole }}</b></td>
+            <td>{{ h.n_played }}</td>
+            <td>{{ h.avg_score }}</td>
+            <td>{{ h.best_score }}</td>
+            <td>{{ h.worst_score }}</td>
+            <td>{{ h.avg_putts }}</td>
+            <td>{% if h.gir_pct is not none %}{{ '%.0f'|format(h.gir_pct) }}%{% else %}—{% endif %}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </details>
   </div>
   {% endfor %}
 
@@ -82,34 +173,64 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
   const TIMELINE = {{ overall.timeline|tojson }};
-  if (TIMELINE.length) {
-    const labels = TIMELINE.map(t => t.date ? t.date.slice(0,10) : '?');
-    const scores = TIMELINE.map(t => t.score);
-    const putts = TIMELINE.map(t => t.putts_per_hole);
-    const girs = TIMELINE.map(t => t.gir_pct);
+  const PER_COURSE = {{ per_course|tojson }};
 
+  // Trend chart (only score, kept simple)
+  if (TIMELINE.length > 1) {
+    const labels = TIMELINE.map(t => t.date ? t.date.slice(5,10) : '?');  // mm-dd
+    const scores = TIMELINE.map(t => t.score);
     new Chart(document.getElementById('trend'), {
       type: 'line',
       data: {
         labels,
-        datasets: [
-          { label: 'Score',         data: scores, borderColor: '#e63946', backgroundColor: '#e6394620', yAxisID: 'y',  tension: 0.25, pointRadius: 4 },
-          { label: 'Putts/hole',    data: putts,  borderColor: '#2a9d8f', backgroundColor: '#2a9d8f20', yAxisID: 'y1', tension: 0.25, pointRadius: 4 },
-          { label: 'GIR %',         data: girs,   borderColor: '#f4a261', backgroundColor: '#f4a26120', yAxisID: 'y2', tension: 0.25, pointRadius: 4 },
-        ],
+        datasets: [{
+          label: 'Score',
+          data: scores,
+          borderColor: '#1d3557',
+          backgroundColor: '#1d355720',
+          tension: 0.3, pointRadius: 5, pointBackgroundColor: '#1d3557', fill: true,
+        }],
       },
       options: {
         responsive: true, maintainAspectRatio: false,
-        interaction: { mode: 'index', intersect: false },
-        plugins: { legend: { position: 'bottom' } },
+        plugins: { legend: { display: false },
+          tooltip: { callbacks: { afterLabel: ctx => TIMELINE[ctx.dataIndex].course } } },
         scales: {
-          y:  { position: 'left',  title: { display: true, text: 'Score' } },
-          y1: { position: 'right', grid: { drawOnChartArea: false }, title: { display: true, text: 'Putts/hole' } },
-          y2: { position: 'right', grid: { drawOnChartArea: false }, min: 0, max: 100, display: false },
+          y: { title: { display: false }, ticks: { stepSize: 1 } },
+          x: { grid: { display: false } },
         },
       },
     });
   }
+
+  // Heatmap cells per course
+  // Color: avg <= 3 -> green, 3-3.5 -> orange, > 3.5 -> red
+  function heatColor(avg) {
+    if (avg <= 3.0) return '#2a9d8f';
+    if (avg <= 3.5) return '#f4a261';
+    return '#e76f51';
+  }
+  PER_COURSE.forEach((c, idx) => {
+    const container = document.getElementById('heat-' + (idx + 1));
+    if (!container) return;
+    const holesByNum = Object.fromEntries(c.per_hole.map(h => [h.hole, h]));
+    // Build 18 cells, gray-out missing holes
+    for (let n = 1; n <= 18; n++) {
+      const cell = document.createElement('div');
+      const h = holesByNum[n];
+      if (h) {
+        cell.className = 'hcell';
+        cell.style.background = heatColor(h.avg_score);
+        cell.innerHTML = `<div class="h">H${n}</div><div class="v">${h.avg_score.toFixed(1)}</div>`;
+        cell.title = `Played ${h.n_played} time${h.n_played===1?'':'s'} · best ${h.best_score} · worst ${h.worst_score}`;
+      } else {
+        cell.className = 'hcell miss';
+        cell.innerHTML = `<div class="h">H${n}</div><div class="v">—</div>`;
+        cell.title = 'Not played';
+      }
+      container.appendChild(cell);
+    }
+  });
 </script>
 </body>
 </html>

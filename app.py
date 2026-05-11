@@ -231,7 +231,9 @@ def stats_page():
     rounds = stats_engine.list_rounds(RUNS_DIR)
     overall = stats_engine.overall_stats(rounds)
     per_course = stats_engine.per_course_stats(rounds)
-    return render_template("stats.html", overall=overall, per_course=per_course)
+    insights = stats_engine.callouts(rounds)
+    return render_template("stats.html",
+                           overall=overall, per_course=per_course, insights=insights)
 
 
 @app.route("/api/stats")
@@ -243,6 +245,7 @@ def stats_api():
         "rounds": rounds,
         "overall": stats_engine.overall_stats(rounds),
         "per_course": stats_engine.per_course_stats(rounds),
+        "callouts": stats_engine.callouts(rounds),
     })
 
 
